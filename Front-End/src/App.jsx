@@ -108,11 +108,10 @@ function App() {
             ],
         },
 
-        // ========== FALLBACK ROUTE ==========
         {
-            path: "*",
-            element: <Navigate to="/dashboard" replace />,
-        },
+            path: "/",
+            element: <Navigate to="/login" replace />,
+        }
     ]);
 
     return (
