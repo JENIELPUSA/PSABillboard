@@ -208,7 +208,7 @@ exports.GadCorner = AsyncErrorHandler(async (req, res) => {
     const { search } = req.query;
 
     const matchStage = {
-        category: "5s-corner"
+        category: "gadcorner"
     };
 
     if (search) {

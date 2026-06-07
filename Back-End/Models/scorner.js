@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const QMScornerSchema = new mongoose.Schema(
+const sCornerSchema = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -28,4 +28,4 @@ const QMScornerSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("QmsCorner", QMScornerSchema);
+module.exports = mongoose.model("sCorner", sCornerSchema);

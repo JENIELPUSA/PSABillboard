@@ -75,13 +75,13 @@ const QmsCorner = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [announcementToDelete, setAnnouncementToDelete] = useState(null);
 
-    // State for managing multiple links
-    const [linkInputs, setLinkInputs] = useState([""]);
+    // State for managing subtitle entries (each has subtitle and googleLink)
+    const [subtitleInputs, setSubtitleInputs] = useState([{ subtitle: "", googleLink: "" }]);
 
-    // Form data for QMS (walang description)
+    // Form data for QMS
     const [formData, setFormData] = useState({
         title: "",
-        googleLink: [""]
+        subtitle: [] // This will store array of objects { subtitle, googleLink }
     });
 
     const carouselImages = [
@@ -90,12 +90,6 @@ const QmsCorner = () => {
         { id: 3, src: asset3, alt: "Image 3" },
         { id: 4, src: asset4, alt: "Image 4" },
     ];
-
-    // Helper function to extract file ID from Google Drive URL
-    const extractFileId = (url) => {
-        const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-        return match ? match[1] : null;
-    };
 
     useEffect(() => {
         const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -125,55 +119,65 @@ const QmsCorner = () => {
         clearSearch();
     };
 
-    // Handle link input changes
-    const handleLinkChange = (index, value) => {
-        const newLinks = [...linkInputs];
-        newLinks[index] = value;
-        setLinkInputs(newLinks);
-        setFormData({ ...formData, googleLink: newLinks.filter(link => link.trim() !== "") });
+    // Handle subtitle input changes
+    const handleSubtitleChange = (index, field, value) => {
+        const newSubtitles = [...subtitleInputs];
+        newSubtitles[index][field] = value;
+        setSubtitleInputs(newSubtitles);
+        
+        // Filter out empty entries for formData
+        const validSubtitles = newSubtitles.filter(item => item.subtitle.trim() !== "" && item.googleLink.trim() !== "");
+        setFormData({ ...formData, subtitle: validSubtitles });
     };
 
-    // Add new link input field
-    const addLinkField = () => {
-        setLinkInputs([...linkInputs, ""]);
+    // Add new subtitle input field
+    const addSubtitleField = () => {
+        setSubtitleInputs([...subtitleInputs, { subtitle: "", googleLink: "" }]);
     };
 
-    // Remove link input field
-    const removeLinkField = (index) => {
-        const newLinks = linkInputs.filter((_, i) => i !== index);
-        setLinkInputs(newLinks);
-        setFormData({ ...formData, googleLink: newLinks.filter(link => link.trim() !== "") });
+    // Remove subtitle input field
+    const removeSubtitleField = (index) => {
+        const newSubtitles = subtitleInputs.filter((_, i) => i !== index);
+        setSubtitleInputs(newSubtitles);
+        const validSubtitles = newSubtitles.filter(item => item.subtitle.trim() !== "" && item.googleLink.trim() !== "");
+        setFormData({ ...formData, subtitle: validSubtitles });
     };
 
     const openModalForAdd = () => {
         setEditingId(null);
-        setLinkInputs([""]);
+        setSubtitleInputs([{ subtitle: "", googleLink: "" }]);
         setFormData({
             title: "",
-            googleLink: [""]
+            subtitle: []
         });
         setIsModalOpen(true);
     };
 
     const openModalForEdit = (item) => {
         setEditingId(item._id);
-        const links = item.googleLink?.length > 0 ? item.googleLink : [""];
-        setLinkInputs([...links]);
+        // Convert existing subtitle array to the form format
+        let subtitles = [];
+        if (item.subtitle && item.subtitle.length > 0) {
+            subtitles = [...item.subtitle];
+        } else {
+            subtitles = [{ subtitle: "", googleLink: "" }];
+        }
+        setSubtitleInputs(subtitles);
         setFormData({
             title: item.title,
-            googleLink: [...item.googleLink]
+            subtitle: [...subtitles]
         });
         setIsModalOpen(true);
     };
 
-    // Handle Add using context (walang description)
+    // Handle Add using context
     const handleAdd = async (e) => {
         e.preventDefault();
 
-        const validLinks = formData.googleLink.filter(link => link.trim() !== "");
+        const validSubtitles = subtitleInputs.filter(item => item.subtitle.trim() !== "" && item.googleLink.trim() !== "");
 
-        if (validLinks.length === 0) {
-            setToastMsg("Please add at least one Google Drive link!");
+        if (validSubtitles.length === 0) {
+            setToastMsg("Please add at least one subtitle with document name and URL!");
             setToastType("error");
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
@@ -182,7 +186,7 @@ const QmsCorner = () => {
 
         const payload = {
             title: formData.title.toUpperCase(),
-            googleLink: validLinks
+            subtitle: validSubtitles
         };
 
         const result = await AddQmsCorner(payload);
@@ -194,8 +198,8 @@ const QmsCorner = () => {
             setTimeout(() => setShowToast(false), 3000);
 
             // Reset form and close modal
-            setFormData({ title: "", googleLink: [""] });
-            setLinkInputs([""]);
+            setFormData({ title: "", subtitle: [] });
+            setSubtitleInputs([{ subtitle: "", googleLink: "" }]);
             setIsModalOpen(false);
         } else {
             setToastMsg(result.error || "Failed to add document");
@@ -205,14 +209,14 @@ const QmsCorner = () => {
         }
     };
 
-    // Handle Update using context (walang description)
+    // Handle Update using context
     const handleUpdate = async (e) => {
         e.preventDefault();
 
-        const validLinks = formData.googleLink.filter(link => link.trim() !== "");
+        const validSubtitles = subtitleInputs.filter(item => item.subtitle.trim() !== "" && item.googleLink.trim() !== "");
 
-        if (validLinks.length === 0) {
-            setToastMsg("Please add at least one Google Drive link!");
+        if (validSubtitles.length === 0) {
+            setToastMsg("Please add at least one subtitle with document name and URL!");
             setToastType("error");
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
@@ -221,7 +225,7 @@ const QmsCorner = () => {
 
         const updatedItem = {
             title: formData.title.toUpperCase(),
-            googleLink: validLinks
+            subtitle: validSubtitles
         };
 
         console.log('Update payload:', updatedItem);
@@ -234,8 +238,8 @@ const QmsCorner = () => {
             setShowToast(true);
             setTimeout(() => setShowToast(false), 3000);
 
-            setFormData({ title: "", googleLink: [""] });
-            setLinkInputs([""]);
+            setFormData({ title: "", subtitle: [] });
+            setSubtitleInputs([{ subtitle: "", googleLink: "" }]);
             setIsModalOpen(false);
             setEditingId(null);
         } else {
@@ -490,7 +494,7 @@ const QmsCorner = () => {
                         </div>
                     )}
 
-                    {/* Documents List - Walang Description */}
+                    {/* Documents List - Display subtitles as clickable links */}
                     {!loading && !error && qmsCorners.length > 0 && (
                         <>
                             <div className="space-y-4">
@@ -498,36 +502,40 @@ const QmsCorner = () => {
                                     <div key={item._id} className="group bg-white rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
                                         <div className="p-6">
                                             <div className="flex items-start justify-between gap-4 flex-wrap">
-                                                {/* Left side - Title Only (Walang Description) */}
+                                                {/* Left side - Title and subtitle links */}
                                                 <div className="flex-1 min-w-0">
                                                     <div className="mb-2">
                                                         <span className="inline-flex items-center px-2 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-blue-100 text-blue-800">
                                                             QMS DOCUMENT
                                                         </span>
                                                     </div>
-                                                    <h3 className="font-black text-[#0038A8] group-hover:text-[#CE1126] transition-colors text-base md:text-lg leading-tight uppercase mb-3">
+                                                    <h3 className="font-black text-[#0038A8] group-hover:text-[#CE1126] transition-colors text-base md:text-lg leading-tight uppercase mb-4">
                                                         {item.title}
                                                     </h3>
 
-                                                    {/* Display actual Google Drive links */}
-                                                    <div className="space-y-2">
-                                                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Attached Files:</p>
-                                                        <div className="space-y-1.5">
-                                                            {item.googleLink?.map((link, idx) => (
-                                                                <a
-                                                                    key={idx}
-                                                                    href={link}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-[#CE1126] hover:underline break-all transition-colors group/link"
-                                                                >
-                                                                    <Link size={14} className="flex-shrink-0 mt-0.5" />
-                                                                    <span className="truncate">{link}</span>
-                                                                    <ExternalLink size={12} className="flex-shrink-0 opacity-0 group-hover/link:opacity-100 transition-opacity" />
-                                                                </a>
-                                                            ))}
+                                                    {/* Display clickable subtitles with links */}
+                                                    {item.subtitle && item.subtitle.length > 0 && (
+                                                        <div className="space-y-3">
+                                                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Documents:</p>
+                                                            <div className="space-y-2">
+                                                                {item.subtitle.map((sub, idx) => (
+                                                                    <div key={idx} className="flex items-start gap-2">
+                                                                        <ExternalLink size={16} className="text-[#0038A8] flex-shrink-0 mt-0.5" />
+                                                                        <div className="flex-1">
+                                                                            <a
+                                                                                href={sub.googleLink}
+                                                                                target="_blank"
+                                                                                rel="noopener noreferrer"
+                                                                                className="text-[#0038A8] hover:text-[#CE1126] font-medium hover:underline transition-colors"
+                                                                            >
+                                                                                {sub.subtitle}
+                                                                            </a>
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    )}
 
                                                     <p className="text-xs text-slate-400 mt-3">
                                                         Added: {formatDate(item.createdAt)}
@@ -654,10 +662,10 @@ const QmsCorner = () => {
                 </button>
             )}
 
-            {/* MODAL FOR ADD/EDIT - Walang Description Field */}
+            {/* MODAL FOR ADD/EDIT - With subtitle and googleLink fields */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 overflow-y-auto">
-                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200 my-8">
+                    <div className="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200 my-8">
                         <div className={`p-6 flex justify-between items-center text-white ${editingId ? 'bg-amber-600' : 'bg-[#0038A8]'}`}>
                             <div className="flex items-center gap-2">
                                 <FileText size={20} className="text-[#FCD116]" />
@@ -680,44 +688,65 @@ const QmsCorner = () => {
 
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Google Drive Links *</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Document Subtitles & Links *</label>
                                     <button
                                         type="button"
-                                        onClick={addLinkField}
+                                        onClick={addSubtitleField}
                                         className="inline-flex items-center gap-1 text-xs text-[#0038A8] hover:text-[#CE1126] font-medium"
                                     >
-                                        <Plus size={14} /> Add Another Link
+                                        <Plus size={14} /> Add Another Document
                                     </button>
                                 </div>
 
-                                {linkInputs.map((link, index) => (
-                                    <div key={index} className="flex gap-2">
-                                        <div className="relative flex-1">
-                                            <Link size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                                            <input
-                                                type="url"
-                                                required
-                                                value={link}
-                                                onChange={(e) => handleLinkChange(index, e.target.value)}
-                                                className="w-full pl-11 pr-4 py-3 rounded-xl border border-slate-200 bg-slate-50 outline-none transition-all font-medium focus:ring-4 focus:ring-blue-100"
-                                                placeholder="https://drive.google.com/file/d/.../view"
-                                            />
+                                {subtitleInputs.map((sub, index) => (
+                                    <div key={index} className="space-y-2 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-xs font-bold text-slate-500">Document {index + 1}</span>
+                                            {subtitleInputs.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSubtitleField(index)}
+                                                    className="p-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            )}
                                         </div>
-                                        {linkInputs.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeLinkField(index)}
-                                                className="p-3 rounded-xl bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all"
-                                            >
-                                                <X size={16} />
-                                            </button>
-                                        )}
+                                        
+                                        <div className="space-y-2">
+                                            <div>
+                                                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Subtitle/Document Name *</label>
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    value={sub.subtitle}
+                                                    onChange={(e) => handleSubtitleChange(index, 'subtitle', e.target.value)}
+                                                    className="w-full px-4 py-2 rounded-xl border border-slate-200 bg-white outline-none transition-all focus:ring-4 focus:ring-blue-100"
+                                                    placeholder="e.g., QMS Manual 2024, ISO Certificate, etc."
+                                                />
+                                            </div>
+                                            
+                                            <div>
+                                                <label className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Google Drive URL *</label>
+                                                <div className="relative">
+                                                    <Link size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                                    <input
+                                                        type="url"
+                                                        required
+                                                        value={sub.googleLink}
+                                                        onChange={(e) => handleSubtitleChange(index, 'googleLink', e.target.value)}
+                                                        className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 bg-white outline-none transition-all focus:ring-4 focus:ring-blue-100"
+                                                        placeholder="https://drive.google.com/file/d/.../view"
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
 
                                 <p className="text-xs text-slate-400 flex items-center gap-1 mt-2">
                                     <AlertCircle size={12} />
-                                    You can add multiple Google Drive links for this document
+                                    Each document needs a subtitle/name and a valid Google Drive URL
                                 </p>
                             </div>
 

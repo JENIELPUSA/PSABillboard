@@ -3,21 +3,36 @@ const QmsCornerModel = require("../Models/QMScorner");
 
 // CREATE
 exports.createQmsCorner = AsyncErrorHandler(async (req, res) => {
-    console.log("Middleware Called");
-    console.log(req.body);
+    const { title, subtitle } = req.body;
 
-    const { title, googleLink } = req.body;
-
-    if (!title || !googleLink || googleLink.length === 0) {
+    // Validation
+    if (!title) {
         return res.status(400).json({
             success: false,
-            message: "Title and Google Link are required",
+            message: "Title is required",
         });
+    }
+
+    if (!subtitle || !Array.isArray(subtitle) || subtitle.length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: "At least one subtitle with googleLink is required",
+        });
+    }
+
+    // Validate each subtitle object
+    for (let i = 0; i < subtitle.length; i++) {
+        if (!subtitle[i].subtitle || !subtitle[i].googleLink) {
+            return res.status(400).json({
+                success: false,
+                message: `Each subtitle must have both 'subtitle' and 'googleLink' fields. Error at index ${i}`,
+            });
+        }
     }
 
     const qmsCorner = await QmsCornerModel.create({
         title,
-        googleLink,
+        subtitle: subtitle
     });
 
     return res.status(201).json({
@@ -56,7 +71,7 @@ exports.DisplayQmsCorner = AsyncErrorHandler(async (req, res) => {
                         $project: {
                             _id: 1,
                             title: 1,
-                            googleLink: 1,
+                            subtitle: 1,  // Isama ang buong subtitle array
                             createdAt: 1,
                             updatedAt: 1,
                         },
@@ -80,11 +95,49 @@ exports.DisplayQmsCorner = AsyncErrorHandler(async (req, res) => {
     });
 });
 
+// GET SINGLE QMS CORNER
+exports.getQmsCornerById = AsyncErrorHandler(async (req, res) => {
+    const qmsCorner = await QmsCornerModel.findById(req.params.id);
+
+    if (!qmsCorner) {
+        return res.status(404).json({
+            status: "fail",
+            message: "QMS Corner not found",
+        });
+    }
+
+    res.status(200).json({
+        status: "success",
+        data: qmsCorner,
+    });
+});
+
 // UPDATE
 exports.updateQmsCorner = AsyncErrorHandler(async (req, res) => {
+    const { title, subtitle } = req.body;
+    
+    // Optional: Validate subtitle array if provided
+    if (subtitle && (!Array.isArray(subtitle) || subtitle.length === 0)) {
+        return res.status(400).json({
+            status: "fail",
+            message: "Subtitle must be a non-empty array",
+        });
+    }
+
+    if (subtitle && subtitle.length > 0) {
+        for (let i = 0; i < subtitle.length; i++) {
+            if (!subtitle[i].subtitle || !subtitle[i].googleLink) {
+                return res.status(400).json({
+                    status: "fail",
+                    message: `Each subtitle must have both 'subtitle' and 'googleLink' fields. Error at index ${i}`,
+                });
+            }
+        }
+    }
+
     const qmsCorner = await QmsCornerModel.findByIdAndUpdate(
         req.params.id,
-        req.body,
+        { title, subtitle },
         {
             new: true,
             runValidators: true,
@@ -121,5 +174,71 @@ exports.deleteQmsCorner = AsyncErrorHandler(async (req, res) => {
     res.status(200).json({
         status: "success",
         message: "QMS Corner deleted successfully",
+    });
+});
+
+// ADD SUBTITLE TO EXISTING QMS CORNER
+exports.addSubtitle = AsyncErrorHandler(async (req, res) => {
+    const { id } = req.params;
+    const { subtitle, googleLink } = req.body;
+
+    if (!subtitle || !googleLink) {
+        return res.status(400).json({
+            status: "fail",
+            message: "Both subtitle and googleLink are required",
+        });
+    }
+
+    const qmsCorner = await QmsCornerModel.findByIdAndUpdate(
+        id,
+        {
+            $push: {
+                subtitle: { subtitle, googleLink }
+            }
+        },
+        { new: true, runValidators: true }
+    );
+
+    if (!qmsCorner) {
+        return res.status(404).json({
+            status: "fail",
+            message: "QMS Corner not found",
+        });
+    }
+
+    res.status(200).json({
+        status: "success",
+        message: "Subtitle added successfully",
+        data: qmsCorner,
+    });
+});
+
+// REMOVE SUBTITLE FROM QMS CORNER
+exports.removeSubtitle = AsyncErrorHandler(async (req, res) => {
+    const { id, subtitleIndex } = req.params;
+
+    const qmsCorner = await QmsCornerModel.findById(id);
+
+    if (!qmsCorner) {
+        return res.status(404).json({
+            status: "fail",
+            message: "QMS Corner not found",
+        });
+    }
+
+    if (subtitleIndex >= qmsCorner.subtitle.length) {
+        return res.status(400).json({
+            status: "fail",
+            message: "Invalid subtitle index",
+        });
+    }
+
+    qmsCorner.subtitle.splice(subtitleIndex, 1);
+    await qmsCorner.save();
+
+    res.status(200).json({
+        status: "success",
+        message: "Subtitle removed successfully",
+        data: qmsCorner,
     });
 });
