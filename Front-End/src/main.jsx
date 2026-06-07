@@ -13,7 +13,6 @@ createRoot(document.getElementById('root')).render(
         <AnnouncementProvider>
           <App />
         </AnnouncementProvider>
-
       </QmsCornerProvider>
     </AuthProvider>
 
