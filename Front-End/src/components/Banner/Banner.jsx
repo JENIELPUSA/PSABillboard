@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
-import banner0 from "../../assets/banner0.png";
+import banner12 from "../../assets/banner12.png";
 import banner1 from "../../assets/banner1.png";
 import banner11 from "../../assets/banner11.png";
 import banner2 from "../../assets/banner2.png";
 import banner3 from "../../assets/banner3.png";
-import banner4 from "../../assets/baner4.png";
+import banner4 from "../../assets/banner4.png";
 import banner5 from "../../assets/banner5.png";
 
 export const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const bannerImages = [
-    { id: 1, src: banner0, alt: "Banner 0" },
+    { id: 1, src: banner12, alt: "Banner 12" },
     { id: 2, src: banner1, alt: "Banner 1" },
     { id: 7, src: banner11, alt: "Banner 11" },
     { id: 3, src: banner2, alt: "Banner 2" },
