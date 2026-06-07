@@ -13,7 +13,7 @@ export const Sidebar = forwardRef((props, ref) => {
     const handleLogout = async () => {
         try {
             await logout();
-            navigate("/login");
+            navigate("/dashboard");
         } catch (error) {
             console.error("Failed to log out:", error);
         }
