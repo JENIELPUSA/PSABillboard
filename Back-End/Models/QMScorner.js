@@ -28,4 +28,5 @@ const QMScornerSchema = new mongoose.Schema(
   }
 );
 
+
 module.exports = mongoose.model("QmsCorner", QMScornerSchema);
