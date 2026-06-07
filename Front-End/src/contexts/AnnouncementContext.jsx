@@ -314,8 +314,6 @@ export const AnnouncementProvider = ({ children }) => {
                 gadcorner,
                 gadcornerTotalCount,
                 gadcornerCurrentPage,
-                gadcornerlimit,
-                setgadcornerlimit,
                 setGadcornerCurrentPage,
                 setgadcornerlimit, gadcornerTotalPages, FetchGadCornerData,
 
