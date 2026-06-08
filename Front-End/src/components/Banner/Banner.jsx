@@ -4,7 +4,6 @@ import banner1 from "../../assets/Banner1.png";
 import banner11 from "../../assets/BannerS.png";
 import banner2 from "../../assets/Banner2.png";
 import banner3 from "../../assets/Banner3.png";
-import banner4 from "../../assets/banner4.png";
 import banner5 from "../../assets/Banner5.png";
 
 export const Banner = () => {
@@ -16,7 +15,6 @@ export const Banner = () => {
     { id: 7, src: banner11, alt: "Banner 11" },
     { id: 3, src: banner2, alt: "Banner 2" },
     { id: 4, src: banner3, alt: "Banner 3" },
-    { id: 5, src: banner4, alt: "Banner 4" },
     { id: 6, src: banner5, alt: "Banner 5" },
 
   ];
