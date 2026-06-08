@@ -27,6 +27,7 @@ import asset2 from "../../assets/assets2.jpeg";
 import asset3 from "../../assets/assets3.jpeg";
 import asset4 from "../../assets/assets4.jpeg";
 import bannerVideo from "../../assets/banner.mp4";
+import ISOFooter from '../ISOFooter/Isofooter';
 
 const SCorner = () => {
     const [isMobile, setIsMobile] = useState(false);
@@ -659,6 +660,9 @@ const SCorner = () => {
                     </div>
                 </div>
             )}
+
+            {/* ISO Footer */}
+            <ISOFooter />
         </div>
     );
 };

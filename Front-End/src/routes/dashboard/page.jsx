@@ -141,7 +141,6 @@ const DashboardPage = () => {
                 setShowToast(true);
                 setTimeout(() => setShowToast(false), 3000);
 
-
                 // Refresh data from backend to update pagination
                 await FetchAnnouncementData();
             } else {
@@ -252,19 +251,19 @@ const DashboardPage = () => {
     };
 
     return (
-        <div className="relative flex flex-col gap-y-10 p-0 md:p-4 min-h-screen pb-32 bg-slate-50 dark:bg-slate-950 overflow-x-hidden">
+        <div className="relative flex flex-col gap-y-6 md:gap-y-10 p-3 sm:p-4 lg:p-6 min-h-screen pb-32 bg-slate-50 dark:bg-slate-950 overflow-x-hidden">
 
             {/* --- TOAST NOTIFICATION --- */}
             {showToast && (
-                <div className="fixed top-5 right-5 z-[200] animate-in slide-in-from-right duration-300">
-                    <div className={`${toastType === "success" ? "bg-emerald-500 border-emerald-700" : "bg-red-500 border-red-700"} text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-3 border-b-4`}>
-                        <CheckCircle2 size={24} className="animate-bounce" />
+                <div className="fixed top-4 right-4 z-[200] animate-in slide-in-from-right duration-300">
+                    <div className={`${toastType === "success" ? "bg-emerald-500 border-emerald-700" : "bg-red-500 border-red-700"} text-white px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl shadow-2xl flex items-center gap-2 sm:gap-3 border-b-4`}>
+                        <CheckCircle2 size={20} className="sm:size-24 animate-bounce" />
                         <div>
-                            <p className="font-black text-xs uppercase tracking-widest">{toastType === "success" ? "Success" : "Error"}</p>
-                            <p className="text-sm font-medium">{toastMessage}</p>
+                            <p className="font-black text-[10px] sm:text-xs uppercase tracking-widest">{toastType === "success" ? "Success" : "Error"}</p>
+                            <p className="text-xs sm:text-sm font-medium">{toastMessage}</p>
                         </div>
-                        <button onClick={() => setShowToast(false)} className="ml-4 hover:scale-110 transition-transform">
-                            <X size={18} />
+                        <button onClick={() => setShowToast(false)} className="ml-2 sm:ml-4 hover:scale-110 transition-transform">
+                            <X size={16} className="sm:size-18" />
                         </button>
                     </div>
                 </div>
@@ -273,56 +272,56 @@ const DashboardPage = () => {
             {/* --- LOADING INDICATOR --- */}
             {loading && (
                 <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 flex flex-col items-center gap-4">
-                        <div className="w-12 h-12 border-4 border-[#0038A8] border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-slate-600 dark:text-slate-400 font-medium">Loading memorandums...</p>
+                    <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-6 sm:p-8 flex flex-col items-center gap-3 sm:gap-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 border-4 border-[#0038A8] border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base font-medium">Loading memorandums...</p>
                     </div>
                 </div>
             )}
 
             {/* --- DELETE CONFIRMATION MODAL --- */}
             {showDeleteConfirm && memoToDelete && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
-                        <div className="bg-red-600 p-5 flex justify-between items-center text-white border-b border-white/10">
+                <div className="fixed inset-0 z-[200] flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+                        <div className="bg-red-600 p-4 sm:p-5 flex justify-between items-center text-white border-b border-white/10">
                             <div className="flex items-center gap-2">
-                                <Trash2 size={20} />
-                                <h3 className="font-black uppercase tracking-tight text-sm">Delete Memorandum</h3>
+                                <Trash2 size={18} className="sm:size-20" />
+                                <h3 className="font-black uppercase tracking-tight text-xs sm:text-sm">Delete Memorandum</h3>
                             </div>
                             <button onClick={() => setShowDeleteConfirm(false)} className="hover:bg-white/20 p-1 rounded-full">
-                                <X size={24} />
+                                <X size={20} className="sm:size-24" />
                             </button>
                         </div>
 
-                        <div className="p-6 space-y-5">
-                            <div className="text-center space-y-3">
-                                <div className="bg-red-50 dark:bg-red-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
-                                    <Trash2 size={32} className="text-red-600 dark:text-red-400" />
+                        <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+                            <div className="text-center space-y-2 sm:space-y-3">
+                                <div className="bg-red-50 dark:bg-red-900/20 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto">
+                                    <Trash2 size={28} className="sm:size-32 text-red-600 dark:text-red-400" />
                                 </div>
-                                <p className="text-slate-700 dark:text-slate-300">
+                                <p className="text-slate-700 dark:text-slate-300 text-sm sm:text-base">
                                     Are you sure you want to delete this memorandum?
                                 </p>
-                                <div className="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl">
-                                    <p className="font-bold text-[#0038A8] dark:text-blue-400">{memoToDelete.title}</p>
-                                    <p className="text-sm text-slate-500 mt-1 line-clamp-2">{memoToDelete.description}</p>
+                                <div className="bg-slate-50 dark:bg-slate-800 p-2 sm:p-3 rounded-lg sm:rounded-xl">
+                                    <p className="font-bold text-[#0038A8] dark:text-blue-400 text-sm sm:text-base">{memoToDelete.title}</p>
+                                    <p className="text-xs sm:text-sm text-slate-500 mt-1 line-clamp-2">{memoToDelete.description}</p>
                                 </div>
-                                <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                                <p className="text-[10px] sm:text-xs text-red-600 dark:text-red-400 font-medium">
                                     This action cannot be undone.
                                 </p>
                             </div>
 
-                            <div className="flex gap-3">
+                            <div className="flex gap-2 sm:gap-3">
                                 <button
                                     onClick={() => setShowDeleteConfirm(false)}
-                                    className="flex-1 px-4 py-3 rounded-xl font-bold border border-slate-200 text-slate-600 dark:text-slate-300 uppercase text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold border border-slate-200 text-slate-600 dark:text-slate-300 uppercase text-[10px] sm:text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={() => handleDelete(memoToDelete._id)}
-                                    className="flex-1 px-4 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 transition-all uppercase text-xs flex items-center justify-center gap-2 tracking-widest"
+                                    className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg sm:rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 transition-all uppercase text-[10px] sm:text-xs flex items-center justify-center gap-2 tracking-widest"
                                 >
-                                    <Trash2 size={14} /> Delete
+                                    <Trash2 size={12} className="sm:size-14" /> Delete
                                 </button>
                             </div>
                         </div>
@@ -330,49 +329,49 @@ const DashboardPage = () => {
                 </div>
             )}
 
-            <section className="w-full rounded-3xl overflow-hidden shadow-sm">
+            <section className="w-full rounded-xl sm:rounded-2xl lg:rounded-3xl overflow-hidden shadow-sm">
                 <Banner videoSrc={bannerVideo} />
             </section>
 
-            <section className="w-full bg-white rounded-[2.5rem] shadow-lg p-6 border border-slate-200 flex flex-col">
-                <div className="mb-6 px-4">
-                    <h3 className="text-2xl font-black text-[#0038A8] uppercase tracking-tight">Visual Guides</h3>
-                    <p className="text-[10px] font-black text-[#ce1126] uppercase tracking-[0.2em]">Procedural Walkthrough</p>
+            <section className="w-full bg-white rounded-xl sm:rounded-2xl lg:rounded-[2.5rem] shadow-lg p-4 sm:p-6 border border-slate-200 flex flex-col">
+                <div className="mb-4 sm:mb-6 px-2 sm:px-4">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-[#0038A8] uppercase tracking-tight">Visual Guides</h3>
+                    <p className="text-[8px] sm:text-[10px] font-black text-[#ce1126] uppercase tracking-[0.15em] sm:tracking-[0.2em]">Procedural Walkthrough</p>
                 </div>
-                <div className="w-full rounded-2xl overflow-hidden border border-slate-100">
+                <div className="w-full rounded-xl sm:rounded-2xl overflow-hidden border border-slate-100">
                     <ImageCarousel images={carouselImages} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} />
                 </div>
             </section>
 
             {/* --- MEMO SECTION --- */}
-            <section className="space-y-6 md:space-y-8">
+            <section className="space-y-4 sm:space-y-6 md:space-y-8">
                 {/* Search and Filter Bar */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 sm:p-4 mx-3 sm:mx-6 md:mx-10">
-                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
+                <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 sm:p-4">
+                    <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
                         {/* Search Input */}
                         <form onSubmit={handleSearchSubmit} className="flex-1 w-full">
                             <div className="relative">
-                                <Search size={18} className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <Search size={16} className="sm:size-18 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
                                     value={localSearchTerm}
                                     onChange={(e) => setLocalSearchTerm(e.target.value)}
                                     placeholder="Search memorandums..."
-                                    className="w-full pl-9 sm:pl-11 pr-28 sm:pr-32 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-[#0038A8] transition-all text-sm sm:text-base"
+                                    className="w-full pl-9 pr-28 py-2 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-[#0038A8] transition-all text-sm"
                                 />
-                                <div className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 flex gap-1.5 sm:gap-2">
+                                <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex gap-1">
                                     {searchTerm && (
                                         <button
                                             type="button"
                                             onClick={clearSearch}
-                                            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-medium transition-colors whitespace-nowrap"
+                                            className="px-2 py-1 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-[10px] sm:text-xs font-medium transition-colors whitespace-nowrap"
                                         >
                                             Clear
                                         </button>
                                     )}
                                     <button
                                         type="submit"
-                                        className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg bg-[#0038A8] text-white text-xs font-medium hover:bg-[#002b80] transition-colors whitespace-nowrap"
+                                        className="px-2 sm:px-3 py-1 rounded-md bg-[#0038A8] text-white text-[10px] sm:text-xs font-medium hover:bg-[#002b80] transition-colors whitespace-nowrap"
                                     >
                                         Search
                                     </button>
@@ -381,12 +380,12 @@ const DashboardPage = () => {
                         </form>
 
                         {/* Limit Selector */}
-                        <div className="flex items-center justify-between sm:justify-end gap-3">
-                            <span className="text-xs font-medium text-slate-500">Show:</span>
+                        <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+                            <span className="text-[10px] sm:text-xs font-medium text-slate-500">Show:</span>
                             <select
                                 value={memolimit}
                                 onChange={(e) => handleLimitChange(Number(e.target.value))}
-                                className="flex-1 sm:flex-initial px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900"
+                                className="flex-1 sm:flex-initial px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs sm:text-sm font-medium outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900"
                             >
                                 {limitOptions.map(opt => (
                                     <option key={opt} value={opt}>{opt} per page</option>
@@ -397,22 +396,22 @@ const DashboardPage = () => {
 
                     {/* Search Results Info */}
                     {isSearching && searchTerm && (
-                        <div className="mt-3 text-xs sm:text-sm text-slate-500 flex flex-wrap items-center gap-2">
-                            <Eye size={14} className="flex-shrink-0" />
+                        <div className="mt-2 sm:mt-3 text-[10px] sm:text-xs text-slate-500 flex flex-wrap items-center gap-1 sm:gap-2">
+                            <Eye size={12} className="sm:size-14 flex-shrink-0" />
                             <span>Showing results for: "<strong className="text-[#0038A8] break-all">{searchTerm}</strong>"</span>
-                            <span className="text-xs whitespace-nowrap">({memototalCount} total results)</span>
+                            <span className="text-[10px] sm:text-xs whitespace-nowrap">({memototalCount} total results)</span>
                         </div>
                     )}
                 </div>
 
                 {!loading && memoAnnouncements.length === 0 ? (
-                    <div className="text-center py-8 sm:py-12 px-3 sm:px-4">
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800 mx-3 sm:mx-6 md:mx-10">
-                            <FileText size={40} className="mx-auto text-slate-400 mb-3 sm:mb-4" />
-                            <h3 className="text-lg sm:text-xl font-bold text-slate-600 dark:text-slate-400 mb-2">
+                    <div className="text-center py-8 sm:py-12">
+                        <div className="bg-white dark:bg-slate-900 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800">
+                            <FileText size={32} className="sm:size-40 mx-auto text-slate-400 mb-3 sm:mb-4" />
+                            <h3 className="text-base sm:text-lg lg:text-xl font-bold text-slate-600 dark:text-slate-400 mb-2">
                                 {searchTerm ? "No matching memorandums found" : "No Memorandums Yet"}
                             </h3>
-                            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-500 px-2">
+                            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-500">
                                 {searchTerm
                                     ? "Try searching with different keywords"
                                     : isAdmin
@@ -423,8 +422,8 @@ const DashboardPage = () => {
                     </div>
                 ) : (
                     <>
-                        {/* Memo Cards Grid - Responsive */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 px-3 sm:px-6 md:px-10">
+                        {/* Memo Cards Grid - Optimized for 1060x858 */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-5">
                             {memoAnnouncements.map((memo) => (
                                 <MemoCard
                                     key={memo._id}
@@ -437,16 +436,16 @@ const DashboardPage = () => {
                             ))}
                         </div>
 
-                        {/* PAGINATION CONTROLS - Responsive */}
+                        {/* PAGINATION CONTROLS - Optimized for 1060x858 */}
                         {backendTotalPages > 1 && (
-                            <div className="flex flex-col items-center gap-4 sm:gap-6 mt-6 sm:mt-8">
+                            <div className="flex flex-col items-center gap-3 sm:gap-4 lg:gap-6 mt-4 sm:mt-6 lg:mt-8">
                                 {/* Pagination Buttons */}
-                                <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap px-2">
-                                    {/* First Page - Hide on very small screens */}
+                                <div className="flex items-center justify-center gap-1 flex-wrap">
+                                    {/* First Page - Show on medium screens and up */}
                                     <button
                                         onClick={() => handlePageChange(1)}
                                         disabled={localCurrentPage === 1}
-                                        className="hidden sm:flex px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold items-center"
+                                        className="hidden sm:flex px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold items-center"
                                     >
                                         First
                                     </button>
@@ -455,13 +454,13 @@ const DashboardPage = () => {
                                     <button
                                         onClick={() => handlePageChange(localCurrentPage - 1)}
                                         disabled={localCurrentPage === 1}
-                                        className="p-2 sm:p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
+                                        className="p-1.5 sm:p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
                                     >
-                                        <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
+                                        <ChevronLeft size={14} className="sm:size-16" />
                                     </button>
 
                                     {/* Page Numbers - Responsive display */}
-                                    <div className="flex gap-1 sm:gap-2">
+                                    <div className="flex gap-1">
                                         {Array.from({ length: Math.min(5, backendTotalPages) }, (_, i) => {
                                             let pageNum;
                                             if (backendTotalPages <= 5) {
@@ -479,7 +478,7 @@ const DashboardPage = () => {
                                                     <button
                                                         key={pageNum}
                                                         onClick={() => handlePageChange(pageNum)}
-                                                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl font-bold text-xs sm:text-sm transition-all ${localCurrentPage === pageNum
+                                                        className={`w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 rounded-lg font-bold text-xs transition-all ${localCurrentPage === pageNum
                                                                 ? "bg-[#0038A8] text-white shadow-lg scale-105"
                                                                 : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
                                                             }`}
@@ -496,23 +495,23 @@ const DashboardPage = () => {
                                     <button
                                         onClick={() => handlePageChange(localCurrentPage + 1)}
                                         disabled={localCurrentPage === backendTotalPages}
-                                        className="p-2 sm:p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
+                                        className="p-1.5 sm:p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
                                     >
-                                        <ChevronRight size={16} className="sm:w-5 sm:h-5" />
+                                        <ChevronRight size={14} className="sm:size-16" />
                                     </button>
 
-                                    {/* Last Page - Hide on very small screens */}
+                                    {/* Last Page - Show on medium screens and up */}
                                     <button
                                         onClick={() => handlePageChange(backendTotalPages)}
                                         disabled={localCurrentPage === backendTotalPages}
-                                        className="hidden sm:flex px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold items-center"
+                                        className="hidden sm:flex px-2 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold items-center"
                                     >
                                         Last
                                     </button>
                                 </div>
 
-                                {/* Page Info - Responsive text size */}
-                                <div className="text-xs sm:text-sm text-slate-500 text-center px-3">
+                                {/* Page Info */}
+                                <div className="text-[10px] sm:text-xs text-slate-500 text-center">
                                     Page {localCurrentPage} of {backendTotalPages} •
                                     <span className="ml-1 font-medium text-[#0038A8]">{memototalCount} total memorandums</span>
                                 </div>
@@ -522,16 +521,16 @@ const DashboardPage = () => {
                 )}
             </section>
 
-            {/* Pledge Section */}
-            <section className="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 mx-4 md:mx-10">
-                <h2 className="text-center text-3xl md:text-4xl font-black text-[#0038A8] mb-12 flex items-center justify-center gap-4 italic uppercase">
-                    <ShieldCheck size={44} className="text-[#FCD116]" /> Pledge of Commitment
+            {/* Pledge Section - Optimized for 1060x858 */}
+            <section className="bg-white dark:bg-slate-900 p-6 sm:p-8 lg:p-12 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <h2 className="text-center text-2xl sm:text-3xl lg:text-4xl font-black text-[#0038A8] mb-8 sm:mb-10 lg:mb-12 flex items-center justify-center gap-3 sm:gap-4 italic uppercase">
+                    <ShieldCheck size={32} className="sm:size-36 lg:size-44 text-[#FCD116]" /> Pledge of Commitment
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-10 lg:gap-12">
                     {[{ year: "2024", img: pledge2024 }, { year: "2025", img: pledge2025 }].map((p) => (
-                        <div key={p.year} className="text-center space-y-6">
-                            <span className="inline-block px-6 py-2 bg-slate-100 dark:bg-slate-800 rounded-full text-sm font-black text-slate-600 uppercase">Year {p.year}</span>
-                            <div className="overflow-hidden rounded-2xl border-[10px] border-slate-50 dark:border-slate-800 shadow-2xl">
+                        <div key={p.year} className="text-center space-y-4 sm:space-y-6">
+                            <span className="inline-block px-4 sm:px-6 py-1.5 sm:py-2 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] sm:text-xs font-black text-slate-600 uppercase">Year {p.year}</span>
+                            <div className="overflow-hidden rounded-xl sm:rounded-2xl border-[6px] sm:border-[8px] lg:border-[10px] border-slate-50 dark:border-slate-800 shadow-xl sm:shadow-2xl">
                                 <img src={p.img} alt={`Pledge ${p.year}`} className="w-full h-auto object-fill" />
                             </div>
                         </div>
@@ -539,95 +538,95 @@ const DashboardPage = () => {
                 </div>
             </section>
 
-            {/* Calendar Section */}
-            <section className="bg-white dark:bg-slate-900 p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 mx-4 md:mx-10">
-                <h2 className="text-2xl font-bold text-[#0038A8] mb-8 flex items-center gap-3">
-                    <Calendar className="text-[#FCD116]" size={28} /> ORD Calendar of Activities
+            {/* Calendar Section - Optimized for 1060x858 */}
+            <section className="bg-white dark:bg-slate-900 p-5 sm:p-8 lg:p-10 rounded-xl sm:rounded-2xl lg:rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <h2 className="text-xl sm:text-2xl font-bold text-[#0038A8] mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
+                    <Calendar className="text-[#FCD116]" size={22} className="sm:size-24 lg:size-28" /> ORD Calendar of Activities
                 </h2>
-                <div className="relative w-full overflow-hidden pb-[75%] md:pb-[50%] h-0 rounded-2xl border-4 border-slate-50 dark:border-slate-800 shadow-inner">
+                <div className="relative w-full overflow-hidden pb-[75%] sm:pb-[56.25%] md:pb-[50%] h-0 rounded-xl sm:rounded-2xl border-4 border-slate-50 dark:border-slate-800 shadow-inner">
                     <iframe src="https://www.google.com/calendar/embed?src=rsso08@psa.gov.ph" className="absolute top-0 left-0 w-full h-full border-0 bg-white" title="PSA Calendar" />
                 </div>
             </section>
 
-            {/* ISO Footer */}
-            <div className="flex flex-col items-center gap-8 py-20 border-t-4 border-[#0038A8] bg-slate-50 dark:bg-[#0b1120] mx-0 px-4 md:px-20 text-center">
-                <div className="bg-white p-6 rounded-xl shadow-md border-b-4 border-[#CE1126]">
-                    <img src={isoLogo} alt="ISO 9001 Certified" className="h-28 md:h-36 object-contain" />
+            {/* ISO Footer - Optimized for 1060x858 */}
+            <div className="flex flex-col items-center gap-6 sm:gap-8 py-12 sm:py-16 lg:py-20 border-t-4 border-[#0038A8] bg-slate-50 dark:bg-[#0b1120] text-center">
+                <div className="bg-white p-4 sm:p-5 lg:p-6 rounded-lg sm:rounded-xl shadow-md border-b-4 border-[#CE1126]">
+                    <img src={isoLogo} alt="ISO 9001 Certified" className="h-20 sm:h-24 lg:h-36 object-contain" />
                 </div>
-                <div className="space-y-3">
-                    <p className="text-[#0038A8] dark:text-blue-400 text-xl md:text-2xl font-black uppercase tracking-wider">Philippine Statistics Authority</p>
-                    <div className="flex justify-center items-center gap-1 my-4">
-                        <div className="w-10 h-1.5 bg-[#0038A8]"></div>
-                        <div className="w-10 h-1.5 bg-[#CE1126]"></div>
-                        <div className="w-10 h-1.5 bg-[#FCD116]"></div>
+                <div className="space-y-2 sm:space-y-3 px-4">
+                    <p className="text-[#0038A8] dark:text-blue-400 text-lg sm:text-xl lg:text-2xl font-black uppercase tracking-wider">Philippine Statistics Authority</p>
+                    <div className="flex justify-center items-center gap-1 my-3 sm:my-4">
+                        <div className="w-8 h-1 bg-[#0038A8]"></div>
+                        <div className="w-8 h-1 bg-[#CE1126]"></div>
+                        <div className="w-8 h-1 bg-[#FCD116]"></div>
                     </div>
-                    <p className="text-slate-600 dark:text-slate-400 text-sm font-bold uppercase tracking-widest">System Design & Development</p>
-                    <p className="text-slate-800 dark:text-slate-200 font-semibold text-lg">Michael Angelo M. Calleza <span className="text-[#CE1126]">&</span> JENIEL A. PUSA</p>
+                    <p className="text-slate-600 dark:text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest">System Design & Development</p>
+                    <p className="text-slate-800 dark:text-slate-200 font-semibold text-sm sm:text-base lg:text-lg">Michael Angelo M. Calleza <span className="text-[#CE1126]">&</span> JENIEL A. PUSA</p>
                 </div>
             </div>
 
             {/* Footer Component */}
             <Footer />
 
-            {/* --- FLOATING ACTION BUTTON - Only show for Admin --- */}
+            {/* --- FLOATING ACTION BUTTON - Only show for Admin, optimized for 1060x858 --- */}
             {isAdmin && (
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="fixed bottom-8 right-8 w-16 h-16 bg-[#0038A8] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[#CE1126] transition-all duration-300 z-50 group hover:scale-110 border-4 border-white dark:border-slate-900"
+                    className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-[#0038A8] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[#CE1126] transition-all duration-300 z-50 group hover:scale-110 border-4 border-white dark:border-slate-900"
                 >
-                    <Plus size={32} className="group-hover:rotate-90 transition-transform duration-300" />
+                    <Plus size={22} className="sm:size-26 lg:size-32 group-hover:rotate-90 transition-transform duration-300" />
                 </button>
             )}
 
             {/* --- ADD MEMO MODAL --- */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
-                        <div className="bg-[#0038A8] p-5 flex justify-between items-center text-white border-b border-white/10">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+                        <div className="bg-[#0038A8] p-4 sm:p-5 flex justify-between items-center text-white border-b border-white/10">
                             <div className="flex items-center gap-2">
-                                <FileText size={20} className="text-[#FCD116]" />
-                                <h3 className="font-black uppercase tracking-tight text-sm">Post New Memorandum</h3>
+                                <FileText size={18} className="sm:size-20 text-[#FCD116]" />
+                                <h3 className="font-black uppercase tracking-tight text-xs sm:text-sm">Post New Memorandum</h3>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="hover:bg-white/20 p-1 rounded-full"><X size={24} /></button>
+                            <button onClick={() => setIsModalOpen(false)} className="hover:bg-white/20 p-1 rounded-full"><X size={20} className="sm:size-24" /></button>
                         </div>
 
-                        <form className="p-6 space-y-5" onSubmit={handleAddMemo}>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Memo Category / Title</label>
+                        <form className="p-4 sm:p-6 space-y-4 sm:space-y-5" onSubmit={handleAddMemo}>
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <label className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Memo Category / Title</label>
                                 <input
                                     type="text"
                                     required
                                     value={formData.title}
                                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                     placeholder="e.g. IT UPDATES - FEB 2026"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none text-sm"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Description</label>
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <label className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Description</label>
                                 <textarea
-                                    rows="3"
+                                    rows={3}
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                     placeholder="Brief summary..."
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none resize-none"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none resize-none text-sm"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Google Drive Link</label>
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <label className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Google Drive Link</label>
                                 <input
                                     type="url"
                                     required
                                     value={formData.url}
                                     onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                                     placeholder="https://drive.google.com/..."
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none text-sm"
                                 />
                             </div>
-                            <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold border border-slate-200 text-slate-600 dark:text-slate-300 uppercase text-xs">Cancel</button>
-                                <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold bg-[#0038A8] text-white hover:bg-[#CE1126] transition-all uppercase text-xs flex items-center justify-center gap-2 tracking-widest">
-                                    <Send size={14} /> Post Memo
+                            <div className="pt-3 sm:pt-4 flex gap-2 sm:gap-3">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold border border-slate-200 text-slate-600 dark:text-slate-300 uppercase text-[10px] sm:text-xs">Cancel</button>
+                                <button type="submit" className="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold bg-[#0038A8] text-white hover:bg-[#CE1126] transition-all uppercase text-[10px] sm:text-xs flex items-center justify-center gap-2 tracking-widest">
+                                    <Send size={12} className="sm:size-14" /> Post Memo
                                 </button>
                             </div>
                         </form>
@@ -637,54 +636,53 @@ const DashboardPage = () => {
 
             {/* --- EDIT MEMO MODAL --- */}
             {isEditModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
-                        <div className="bg-[#0038A8] p-5 flex justify-between items-center text-white border-b border-white/10">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-xl sm:rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+                        <div className="bg-[#0038A8] p-4 sm:p-5 flex justify-between items-center text-white border-b border-white/10">
                             <div className="flex items-center gap-2">
-                                <Edit2 size={20} className="text-[#FCD116]" />
-                                <h3 className="font-black uppercase tracking-tight text-sm">Edit Memorandum</h3>
+                                <Edit2 size={18} className="sm:size-20 text-[#FCD116]" />
+                                <h3 className="font-black uppercase tracking-tight text-xs sm:text-sm">Edit Memorandum</h3>
                             </div>
-                            <button onClick={() => setIsEditModalOpen(false)} className="hover:bg-white/20 p-1 rounded-full"><X size={24} /></button>
+                            <button onClick={() => setIsEditModalOpen(false)} className="hover:bg-white/20 p-1 rounded-full"><X size={20} className="sm:size-24" /></button>
                         </div>
 
-                        <form className="p-6 space-y-5" onSubmit={handleUpdate}>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Memo Category / Title</label>
+                        <form className="p-4 sm:p-6 space-y-4 sm:space-y-5" onSubmit={handleUpdate}>
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <label className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Memo Category / Title</label>
                                 <input
                                     type="text"
                                     required
                                     value={editFormData.title}
                                     onChange={(e) => setEditFormData({ ...editFormData, title: e.target.value })}
                                     placeholder="e.g. IT UPDATES - FEB 2026"
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none text-sm"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Description</label>
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <label className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Description</label>
                                 <textarea
-                                    rows="3"
-
+                                    rows={3}
                                     value={editFormData.description}
                                     onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                                     placeholder="Brief summary..."
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none resize-none"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none resize-none text-sm"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Google Drive Link</label>
+                            <div className="space-y-1.5 sm:space-y-2">
+                                <label className="text-[8px] sm:text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Google Drive Link</label>
                                 <input
                                     type="url"
                                     required
                                     value={editFormData.url}
                                     onChange={(e) => setEditFormData({ ...editFormData, url: e.target.value })}
                                     placeholder="https://drive.google.com/..."
-                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-[#0038A8] outline-none text-sm"
                                 />
                             </div>
-                            <div className="pt-4 flex gap-3">
-                                <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 px-4 py-3 rounded-xl font-bold border border-slate-200 text-slate-600 dark:text-slate-300 uppercase text-xs">Cancel</button>
-                                <button type="submit" className="flex-1 px-4 py-3 rounded-xl font-bold bg-[#0038A8] text-white hover:bg-[#CE1126] transition-all uppercase text-xs flex items-center justify-center gap-2 tracking-widest">
-                                    <Edit2 size={14} /> Update Memo
+                            <div className="pt-3 sm:pt-4 flex gap-2 sm:gap-3">
+                                <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold border border-slate-200 text-slate-600 dark:text-slate-300 uppercase text-[10px] sm:text-xs">Cancel</button>
+                                <button type="submit" className="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl font-bold bg-[#0038A8] text-white hover:bg-[#CE1126] transition-all uppercase text-[10px] sm:text-xs flex items-center justify-center gap-2 tracking-widest">
+                                    <Edit2 size={12} className="sm:size-14" /> Update Memo
                                 </button>
                             </div>
                         </form>

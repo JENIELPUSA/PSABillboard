@@ -22,6 +22,7 @@ import { Banner } from '../Banner/Banner';
 import { ImageCarousel } from "../ImageCarousel/ImageCarousel";
 import { QmsCornerContext } from '../../contexts/QmsContext';
 import { AuthContext } from '../../contexts/AuthContext';
+import ISOFooter from '../ISOFooter/Isofooter';
 
 // Assets
 import asset1 from "../../assets/assets1.jpeg";
@@ -760,6 +761,9 @@ const QmsCorner = () => {
                     </div>
                 </div>
             )}
+
+            {/* ISO Footer */}
+            <ISOFooter />
         </div>
     );
 };

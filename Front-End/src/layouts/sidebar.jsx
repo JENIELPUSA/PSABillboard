@@ -19,7 +19,6 @@ export const Sidebar = forwardRef((props, ref) => {
         }
     };
 
-    // ✅ NO ROLE BLOCKING — just optional filtering
     const filteredNavLinks = navbarLinks
         .map((group) => ({
             ...group,

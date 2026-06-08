@@ -20,6 +20,7 @@ import { Banner } from '../Banner/Banner';
 import { ImageCarousel } from "../ImageCarousel/ImageCarousel";
 import { AnnouncementContext } from '../../contexts/AnnouncementContext';
 import { AuthContext } from '../../contexts/AuthContext';
+import ISOFooter from '../ISOFooter/Isofooter';
 
 // Assets
 import asset1 from "../../assets/assets1.jpeg";
@@ -645,6 +646,9 @@ const CitizensCharter = () => {
                     </div>
                 </div>
             )}
+
+            {/* ISO Footer */}
+            <ISOFooter />
         </div>
     );
 };
