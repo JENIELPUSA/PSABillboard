@@ -54,7 +54,7 @@ const DashboardPage = () => {
         searchTerm,
         FetchAnnouncementData, FetchAnnounceMemorandum
     } = useContext(AnnouncementContext);
-    const {role}=useContext(AuthContext)
+    const { role } = useContext(AuthContext)
 
     // Check if user is Admin
     const isAdmin = role === "admin";
@@ -140,7 +140,7 @@ const DashboardPage = () => {
                 setToastType("success");
                 setShowToast(true);
                 setTimeout(() => setShowToast(false), 3000);
-                
+
 
                 // Refresh data from backend to update pagination
                 await FetchAnnouncementData();
@@ -345,34 +345,34 @@ const DashboardPage = () => {
             </section>
 
             {/* --- MEMO SECTION --- */}
-            <section className="space-y-8">
+            <section className="space-y-6 md:space-y-8">
                 {/* Search and Filter Bar */}
-                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 mx-4 md:mx-10">
-                    <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 sm:p-4 mx-3 sm:mx-6 md:mx-10">
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
                         {/* Search Input */}
                         <form onSubmit={handleSearchSubmit} className="flex-1 w-full">
                             <div className="relative">
-                                <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                                <Search size={18} className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                                 <input
                                     type="text"
                                     value={localSearchTerm}
                                     onChange={(e) => setLocalSearchTerm(e.target.value)}
-                                    placeholder="Search memorandums by title or description..."
-                                    className="w-full pl-11 pr-24 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-[#0038A8] transition-all"
+                                    placeholder="Search memorandums..."
+                                    className="w-full pl-9 sm:pl-11 pr-28 sm:pr-32 py-2.5 sm:py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900 focus:border-[#0038A8] transition-all text-sm sm:text-base"
                                 />
-                                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2">
+                                <div className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 flex gap-1.5 sm:gap-2">
                                     {searchTerm && (
                                         <button
                                             type="button"
                                             onClick={clearSearch}
-                                            className="px-3 py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-medium"
+                                            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-medium transition-colors whitespace-nowrap"
                                         >
                                             Clear
                                         </button>
                                     )}
                                     <button
                                         type="submit"
-                                        className="px-4 py-1.5 rounded-lg bg-[#0038A8] text-white text-xs font-medium hover:bg-[#002b80] transition-colors"
+                                        className="px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg bg-[#0038A8] text-white text-xs font-medium hover:bg-[#002b80] transition-colors whitespace-nowrap"
                                     >
                                         Search
                                     </button>
@@ -381,12 +381,12 @@ const DashboardPage = () => {
                         </form>
 
                         {/* Limit Selector */}
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-between sm:justify-end gap-3">
                             <span className="text-xs font-medium text-slate-500">Show:</span>
                             <select
                                 value={memolimit}
                                 onChange={(e) => handleLimitChange(Number(e.target.value))}
-                                className="px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900"
+                                className="flex-1 sm:flex-initial px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm font-medium outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900"
                             >
                                 {limitOptions.map(opt => (
                                     <option key={opt} value={opt}>{opt} per page</option>
@@ -397,31 +397,34 @@ const DashboardPage = () => {
 
                     {/* Search Results Info */}
                     {isSearching && searchTerm && (
-                        <div className="mt-3 text-sm text-slate-500 flex items-center gap-2">
-                            <Eye size={14} />
-                            <span>Showing results for: "<strong className="text-[#0038A8]">{searchTerm}</strong>"</span>
-                            <span className="text-xs">({memototalCount} total results)</span>
+                        <div className="mt-3 text-xs sm:text-sm text-slate-500 flex flex-wrap items-center gap-2">
+                            <Eye size={14} className="flex-shrink-0" />
+                            <span>Showing results for: "<strong className="text-[#0038A8] break-all">{searchTerm}</strong>"</span>
+                            <span className="text-xs whitespace-nowrap">({memototalCount} total results)</span>
                         </div>
                     )}
                 </div>
 
                 {!loading && memoAnnouncements.length === 0 ? (
-                    <div className="text-center py-12 px-4">
-                        <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 shadow-sm border border-slate-200 dark:border-slate-800 mx-4 md:mx-10">
-                            <FileText size={48} className="mx-auto text-slate-400 mb-4" />
-                            <h3 className="text-xl font-bold text-slate-600 dark:text-slate-400 mb-2">
+                    <div className="text-center py-8 sm:py-12 px-3 sm:px-4">
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 dark:border-slate-800 mx-3 sm:mx-6 md:mx-10">
+                            <FileText size={40} className="mx-auto text-slate-400 mb-3 sm:mb-4" />
+                            <h3 className="text-lg sm:text-xl font-bold text-slate-600 dark:text-slate-400 mb-2">
                                 {searchTerm ? "No matching memorandums found" : "No Memorandums Yet"}
                             </h3>
-                            <p className="text-slate-500 dark:text-slate-500">
+                            <p className="text-sm sm:text-base text-slate-500 dark:text-slate-500 px-2">
                                 {searchTerm
-                                    ? `Try searching with different keywords or ${!searchTerm ? "click the + button to post your first memorandum." : "clear the search"}`
-                                    : isAdmin ? "Click the + button to post your first memorandum." : "No memorandums available at this time."}
+                                    ? "Try searching with different keywords"
+                                    : isAdmin
+                                        ? "Click the + button to post your first memorandum."
+                                        : "No memorandums available at this time."}
                             </p>
                         </div>
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 md:px-10">
+                        {/* Memo Cards Grid - Responsive */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 px-3 sm:px-6 md:px-10">
                             {memoAnnouncements.map((memo) => (
                                 <MemoCard
                                     key={memo._id}
@@ -434,30 +437,31 @@ const DashboardPage = () => {
                             ))}
                         </div>
 
-                        {/* PAGINATION CONTROLS - USING BACKEND DATA */}
+                        {/* PAGINATION CONTROLS - Responsive */}
                         {backendTotalPages > 1 && (
-                            <div className="flex flex-col items-center gap-4 mt-8">
-                                <div className="flex items-center justify-center gap-2 flex-wrap">
-                                    {/* First Page */}
+                            <div className="flex flex-col items-center gap-4 sm:gap-6 mt-6 sm:mt-8">
+                                {/* Pagination Buttons */}
+                                <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap px-2">
+                                    {/* First Page - Hide on very small screens */}
                                     <button
                                         onClick={() => handlePageChange(1)}
                                         disabled={localCurrentPage === 1}
-                                        className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold"
+                                        className="hidden sm:flex px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold items-center"
                                     >
                                         First
                                     </button>
 
-                                    {/* Previous */}
+                                    {/* Previous Button */}
                                     <button
                                         onClick={() => handlePageChange(localCurrentPage - 1)}
                                         disabled={localCurrentPage === 1}
-                                        className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
+                                        className="p-2 sm:p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
                                     >
-                                        <ChevronLeft size={20} />
+                                        <ChevronLeft size={16} className="sm:w-5 sm:h-5" />
                                     </button>
 
-                                    {/* Page Numbers */}
-                                    <div className="flex gap-2">
+                                    {/* Page Numbers - Responsive display */}
+                                    <div className="flex gap-1 sm:gap-2">
                                         {Array.from({ length: Math.min(5, backendTotalPages) }, (_, i) => {
                                             let pageNum;
                                             if (backendTotalPages <= 5) {
@@ -475,8 +479,8 @@ const DashboardPage = () => {
                                                     <button
                                                         key={pageNum}
                                                         onClick={() => handlePageChange(pageNum)}
-                                                        className={`w-10 h-10 rounded-xl font-black text-xs transition-all ${localCurrentPage === pageNum
-                                                                ? "bg-[#0038A8] text-white shadow-lg"
+                                                        className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl font-bold text-xs sm:text-sm transition-all ${localCurrentPage === pageNum
+                                                                ? "bg-[#0038A8] text-white shadow-lg scale-105"
                                                                 : "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
                                                             }`}
                                                     >
@@ -488,27 +492,27 @@ const DashboardPage = () => {
                                         })}
                                     </div>
 
-                                    {/* Next */}
+                                    {/* Next Button */}
                                     <button
                                         onClick={() => handlePageChange(localCurrentPage + 1)}
                                         disabled={localCurrentPage === backendTotalPages}
-                                        className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
+                                        className="p-2 sm:p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm"
                                     >
-                                        <ChevronRight size={20} />
+                                        <ChevronRight size={16} className="sm:w-5 sm:h-5" />
                                     </button>
 
-                                    {/* Last Page */}
+                                    {/* Last Page - Hide on very small screens */}
                                     <button
                                         onClick={() => handlePageChange(backendTotalPages)}
                                         disabled={localCurrentPage === backendTotalPages}
-                                        className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold"
+                                        className="hidden sm:flex px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-[#0038A8] hover:text-white disabled:opacity-30 transition-all shadow-sm text-xs font-bold items-center"
                                     >
                                         Last
                                     </button>
                                 </div>
 
-                                {/* Page Info */}
-                                <div className="text-sm text-slate-500">
+                                {/* Page Info - Responsive text size */}
+                                <div className="text-xs sm:text-sm text-slate-500 text-center px-3">
                                     Page {localCurrentPage} of {backendTotalPages} •
                                     <span className="ml-1 font-medium text-[#0038A8]">{memototalCount} total memorandums</span>
                                 </div>
@@ -659,7 +663,7 @@ const DashboardPage = () => {
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Description</label>
                                 <textarea
                                     rows="3"
-                
+
                                     value={editFormData.description}
                                     onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                                     placeholder="Brief summary..."
