@@ -4,7 +4,7 @@ import banner1 from "../../assets/Banner1.png";
 import banner11 from "../../assets/Banner11.png";
 import banner2 from "../../assets/Banner2.png";
 import banner3 from "../../assets/Banner3.png";
-import banner4 from "../../assets/Banner4.png";
+import banner4 from "../../assets/banner4.png";
 import banner5 from "../../assets/Banner5.png";
 
 export const Banner = () => {
