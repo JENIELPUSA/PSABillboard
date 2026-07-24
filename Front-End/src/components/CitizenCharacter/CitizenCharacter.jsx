@@ -567,7 +567,7 @@ const CitizensCharter = () => {
         return date.toISOString().split('T')[0];
     };
 
-    // Render the flip card form
+    // Render the flip card form - PINATAAS ANG HEIGHT
     const renderFlipCardForm = () => {
         const isNewCard = flippedCardId === 'new';
         const isEditing = !!editingId && !isNewCard;
@@ -577,10 +577,10 @@ const CitizensCharter = () => {
 
         return (
             <div className="col-span-1 md:col-span-2 xl:col-span-3">
-                <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-[#0038A8] overflow-hidden animate-in slide-in-from-bottom duration-300">
-                    {/* Header */}
+                <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-[#0038A8] overflow-hidden animate-in slide-in-from-bottom duration-300 max-h-[95vh] overflow-y-auto">
+                    {/* Header - STICKY */}
                     <div
-                        className={`relative p-5 sm:p-6 flex justify-between items-center text-white ${
+                        className={`sticky top-0 z-10 relative p-5 sm:p-6 flex justify-between items-center text-white ${
                             isEditing || isNewCard && editingId
                                 ? 'bg-gradient-to-r from-amber-600 to-amber-700'
                                 : 'bg-gradient-to-r from-[#0038A8] to-[#002b80]'
@@ -618,8 +618,8 @@ const CitizensCharter = () => {
                         </button>
                     </div>
 
-                    {/* Form */}
-                    <form className="p-5 sm:p-6" onSubmit={handleSubmit}>
+                    {/* Form - PINATAAS ANG MGA INPUT */}
+                    <form className="p-5 sm:p-6 bg-white" onSubmit={handleSubmit}>
                         {/* Title */}
                         <div className="space-y-5">
                             <div className="space-y-1.5">
@@ -638,12 +638,12 @@ const CitizensCharter = () => {
                                             title: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 outline-none transition-all font-medium text-sm focus:ring-4 focus:ring-blue-100 focus:border-[#0038A8] hover:border-[#0038A8]/30"
+                                    className="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 outline-none transition-all font-medium text-sm focus:ring-4 focus:ring-blue-100 focus:border-[#0038A8] hover:border-[#0038A8]/30"
                                     placeholder="Enter document title..."
                                 />
                             </div>
 
-                            {/* Description */}
+                            {/* Description - DINAGDAGAN ANG HEIGHT */}
                             <div className="space-y-1.5">
                                 <label className="text-xs font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
                                     <span className="w-2 h-2 bg-[#0038A8] rounded-full"></span>
@@ -651,7 +651,7 @@ const CitizensCharter = () => {
                                 </label>
 
                                 <textarea
-                                    rows={3}
+                                    rows={4}
                                     value={formData.description}
                                     onChange={(e) =>
                                         setFormData({
@@ -659,14 +659,14 @@ const CitizensCharter = () => {
                                             description: e.target.value,
                                         })
                                     }
-                                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 outline-none resize-none transition-all font-medium text-sm focus:ring-4 focus:ring-blue-100 focus:border-[#0038A8] hover:border-[#0038A8]/30"
+                                    className="w-full px-4 py-3.5 rounded-xl border-2 border-slate-200 bg-slate-50 outline-none resize-y transition-all font-medium text-sm focus:ring-4 focus:ring-blue-100 focus:border-[#0038A8] hover:border-[#0038A8]/30 min-h-[120px]"
                                     placeholder="Enter description..."
                                 />
                             </div>
 
-                            {/* Links */}
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between border-b-2 border-slate-100 pb-2">
+                            {/* Links - PINATAAS ANG MGA INPUT */}
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between border-b-2 border-slate-100 pb-3">
                                     <label className="text-xs font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
                                         <span className="w-2 h-2 bg-[#0038A8] rounded-full"></span>
                                         Document Links
@@ -675,7 +675,7 @@ const CitizensCharter = () => {
                                     <button
                                         type="button"
                                         onClick={addLinkField}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0038A8] text-white rounded-lg text-xs font-bold hover:bg-[#CE1126] transition-all shadow-md active:scale-95"
+                                        className="flex items-center gap-1.5 px-4 py-2 bg-[#0038A8] text-white rounded-lg text-xs font-bold hover:bg-[#CE1126] transition-all shadow-md active:scale-95"
                                     >
                                         <PlusCircle size={15} />
                                         Add Link
@@ -685,9 +685,9 @@ const CitizensCharter = () => {
                                 {formData.links.map((link, index) => (
                                     <div
                                         key={index}
-                                        className="flex gap-3 items-start bg-slate-50/80 p-4 rounded-2xl border-2 border-slate-200 hover:border-[#0038A8]/30 transition-all"
+                                        className="flex gap-3 items-start bg-slate-50/80 p-5 rounded-2xl border-2 border-slate-200 hover:border-[#0038A8]/30 transition-all"
                                     >
-                                        <div className="flex-1 space-y-3">
+                                        <div className="flex-1 space-y-4">
                                             <div>
                                                 <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
                                                     <span className="text-[#0038A8]">
@@ -707,7 +707,7 @@ const CitizensCharter = () => {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none transition-all text-xs font-medium focus:border-[#0038A8]"
+                                                    className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-white outline-none transition-all text-sm font-medium focus:border-[#0038A8]"
                                                     placeholder="e.g., View Document"
                                                 />
                                             </div>
@@ -728,7 +728,7 @@ const CitizensCharter = () => {
                                                             e.target.value
                                                         )
                                                     }
-                                                    className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white outline-none transition-all text-xs font-medium focus:border-[#0038A8]"
+                                                    className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-white outline-none transition-all text-sm font-medium focus:border-[#0038A8]"
                                                     placeholder="https://drive.google.com/file/d/..."
                                                 />
                                             </div>
@@ -740,7 +740,7 @@ const CitizensCharter = () => {
                                                 onClick={() =>
                                                     removeLinkField(index)
                                                 }
-                                                className="mt-1 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 hover:scale-105"
+                                                className="mt-1 p-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 hover:scale-105"
                                             >
                                                 <Trash size={18} />
                                             </button>
@@ -750,19 +750,19 @@ const CitizensCharter = () => {
                             </div>
                         </div>
 
-                        {/* Footer */}
-                        <div className="pt-4 mt-4 flex gap-3 border-t-2 border-slate-100">
+                        {/* Footer - STICKY */}
+                        <div className="sticky bottom-0 bg-white pt-6 mt-6 flex gap-3 border-t-2 border-slate-100 pb-1">
                             <button
                                 type="button"
                                 onClick={closeFlippedCard}
-                                className="flex-1 px-4 py-3 rounded-xl font-bold border-2 border-slate-200 text-slate-600 uppercase text-xs hover:bg-slate-50 transition-all"
+                                className="flex-1 px-4 py-3.5 rounded-xl font-bold border-2 border-slate-200 text-slate-600 uppercase text-xs hover:bg-slate-50 transition-all"
                             >
                                 Cancel
                             </button>
 
                             <button
                                 type="submit"
-                                className={`flex-1 px-4 py-3 rounded-xl font-bold text-white transition-all uppercase text-xs flex items-center justify-center gap-2 shadow-lg ${
+                                className={`flex-1 px-4 py-3.5 rounded-xl font-bold text-white transition-all uppercase text-xs flex items-center justify-center gap-2 shadow-lg ${
                                     isEditing || isNewCard && editingId
                                         ? 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700'
                                         : 'bg-gradient-to-r from-[#0038A8] to-[#002b80] hover:from-[#CE1126]'
@@ -780,7 +780,7 @@ const CitizensCharter = () => {
         );
     };
 
-    // ===== NEW: Render Flipped Document Card (PDF Viewer) =====
+    // ===== NEW: Render Flipped Document Card (PDF Viewer) - PINATAAS ANG HEIGHT =====
     const renderFlippedDocumentCard = () => {
         if (!flippedDocumentCard || !viewingDocument) return null;
 
@@ -789,9 +789,9 @@ const CitizensCharter = () => {
 
         return (
             <div className="col-span-1 md:col-span-2 xl:col-span-3">
-                <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-[#0038A8] overflow-hidden animate-in slide-in-from-bottom duration-300">
-                    {/* Header */}
-                    <div className="relative p-5 sm:p-6 flex justify-between items-center text-white bg-gradient-to-r from-[#0038A8] to-[#002b80]">
+                <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-[#0038A8] overflow-hidden animate-in slide-in-from-bottom duration-300 max-h-[95vh] overflow-y-auto">
+                    {/* Header - STICKY */}
+                    <div className="sticky top-0 z-10 relative p-5 sm:p-6 flex justify-between items-center text-white bg-gradient-to-r from-[#0038A8] to-[#002b80]">
                         <div className="absolute inset-0 opacity-10 pointer-events-none">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/3"></div>
                             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/4"></div>
@@ -821,14 +821,14 @@ const CitizensCharter = () => {
                         </button>
                     </div>
 
-                    {/* PDF Viewer Body */}
-                    <div className="p-5 sm:p-6">
+                    {/* PDF Viewer Body - PINATAAS ANG HEIGHT NG IFRAME */}
+                    <div className="p-5 sm:p-6 bg-white">
                         {hasValidFileId ? (
                             <div className="w-full bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
                                 <iframe
                                     src={`https://drive.google.com/file/d/${fileId}/preview`}
                                     width="100%"
-                                    height="600"
+                                    height="700"
                                     allow="autoplay"
                                     className="w-full"
                                     title={viewingDocument.title || 'Document Preview'}
@@ -902,7 +902,7 @@ const CitizensCharter = () => {
                 <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl p-8 flex flex-col items-center gap-4">
                         <div className="w-12 h-12 border-4 border-[#0038A8] border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-slate-600 font-medium">Loading QMS Corners...</p>
+                        <p className="text-slate-600 font-medium">Loading Citizen's Charter...</p>
                     </div>
                 </div>
             )}
@@ -948,8 +948,7 @@ const CitizensCharter = () => {
                                     onClick={() => setShowDeleteConfirm(false)}
                                     className="flex-1 px-4 py-3 rounded-xl font-bold border border-slate-200 text-slate-600 uppercase text-xs hover:bg-slate-50 transition-all"
                                 >
-                                    Cancel
-                                </button>
+                                    Cancel                                </button>
                                 <button
                                     onClick={() => handleDelete(handbookToDelete._id)}
                                     className="flex-1 px-4 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 transition-all uppercase text-xs flex items-center justify-center gap-2 tracking-widest"
