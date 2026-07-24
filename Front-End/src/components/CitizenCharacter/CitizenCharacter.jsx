@@ -1193,24 +1193,6 @@ const CitizensCharter = () => {
                             </form>
 
                             <div className="flex items-center gap-3">
-                                {/* View Mode Toggle */}
-                                <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
-                                    <button
-                                        onClick={() => setViewMode('grid')}
-                                        className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white shadow-md text-[#0038A8]' : 'text-slate-400 hover:text-slate-600'}`}
-                                        title="Grid View"
-                                    >
-                                        <Grid size={18} />
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('list')}
-                                        className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow-md text-[#0038A8]' : 'text-slate-400 hover:text-slate-600'}`}
-                                        title="List View"
-                                    >
-                                        <List size={18} />
-                                    </button>
-                                </div>
-
                                 <span className="text-xs font-medium text-slate-500">Show:</span>
                                 <select
                                     value={limit}
