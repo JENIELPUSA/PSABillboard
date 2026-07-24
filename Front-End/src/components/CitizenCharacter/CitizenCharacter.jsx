@@ -1142,20 +1142,13 @@ const CitizensCharter = () => {
             )}
 
             <main className="w-full p-6 md:p-10 flex flex-col gap-8 max-w-[1600px] mx-auto">
-                <section className="w-full bg-gradient-to-br from-[#0038A8] to-[#002b80] rounded-[2.5rem] py-16 px-8 text-center text-white shadow-xl relative overflow-hidden">
-                    <div className="relative z-10">
-                        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-white/20">
-                            <Building2 size={14} className="text-[#FCD116]" />
-                            <span>Republic of the Philippines • PSA</span>
-                        </div>
-                        <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] font-black leading-none mb-4 tracking-tighter uppercase">
-                            CITIZEN'S<span className="text-[#FCD116]"> CHARTER</span>
-                        </h1>
-                        <p className="text-white/80 text-lg font-medium max-w-2xl mx-auto">
-                            Quality Management System • 5S • Citizen Character • GAD Corner
-                        </p>
-                    </div>
-                </section>
+               <section className="w-full bg-gradient-to-br from-[#0038A8] to-[#002b80] rounded-[2.5rem] py-16 px-8 text-center text-white shadow-xl relative overflow-hidden">
+    <div className="relative z-10">
+        <h1 className="text-[clamp(4rem,8vw,7rem)] font-black leading-none mb-4 tracking-tighter uppercase">
+            CITIZEN'S<span className="text-[#FCD116]"> CHARTER</span>
+        </h1>
+    </div>
+</section>
 
                 {/* QMS CORNERS GRID SECTION */}
                 <section className="w-full space-y-8">
