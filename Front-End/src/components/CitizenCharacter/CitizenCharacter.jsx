@@ -780,7 +780,7 @@ const CitizensCharter = () => {
         );
     };
 
-    // ===== NEW: Render Flipped Document Card (PDF Viewer) - PINATAAS ANG HEIGHT =====
+    // ===== NEW: Render Flipped Document Card (PDF Viewer) - A4/FULL PAGE VIEW =====
     const renderFlippedDocumentCard = () => {
         if (!flippedDocumentCard || !viewingDocument) return null;
 
@@ -807,7 +807,7 @@ const CitizensCharter = () => {
                                     {viewingDocument.title || 'Document Viewer'}
                                 </h3>
                                 <p className="text-white/80 text-xs font-medium mt-0.5">
-                                    PDF Document Preview
+                                    PDF Document Preview - A4 View
                                 </p>
                             </div>
                         </div>
@@ -821,30 +821,52 @@ const CitizensCharter = () => {
                         </button>
                     </div>
 
-                    {/* PDF Viewer Body - PINATAAS ANG HEIGHT NG IFRAME */}
+                    {/* PDF Viewer Body - PROPER A4/FULL PAGE DISPLAY */}
                     <div className="p-5 sm:p-6 bg-white">
                         {hasValidFileId ? (
                             <div className="w-full bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
-                                <iframe
-                                    src={`https://drive.google.com/file/d/${fileId}/preview`}
-                                    width="100%"
-                                    height="700"
-                                    allow="autoplay"
-                                    className="w-full"
-                                    title={viewingDocument.title || 'Document Preview'}
-                                />
-                                <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-                                    <span className="text-xs text-slate-500 font-medium">
-                                        📄 {viewingDocument.title || 'Document'}
-                                    </span>
-                                    <a
-                                        href={`https://drive.google.com/file/d/${fileId}/view`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-xs text-[#0038A8] hover:text-[#CE1126] font-bold flex items-center gap-1"
-                                    >
-                                        Open in new tab <ExternalLink size={12} />
-                                    </a>
+                                {/* A4 Aspect Ratio Container (1:√2 ≈ 1:1.414) */}
+                                <div className="relative w-full" style={{ paddingBottom: '141.4%' }}>
+                                    <iframe
+                                        src={`https://drive.google.com/file/d/${fileId}/preview`}
+                                        width="100%"
+                                        height="100%"
+                                        allow="autoplay; fullscreen"
+                                        className="absolute top-0 left-0 w-full h-full"
+                                        title={viewingDocument.title || 'Document Preview'}
+                                        style={{ border: 0 }}
+                                        allowFullScreen
+                                    />
+                                </div>
+                                
+                                {/* Footer with controls */}
+                                <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center flex-wrap gap-2">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]">
+                                            📄 {viewingDocument.title || 'Document'}
+                                        </span>
+                                        <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                                            A4 Size
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <a
+                                            href={`https://drive.google.com/file/d/${fileId}/view`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs text-[#0038A8] hover:text-[#CE1126] font-bold flex items-center gap-1 transition-colors"
+                                        >
+                                            <ExternalLink size={12} /> Open in new tab
+                                        </a>
+                                        <a
+                                            href={`https://drive.google.com/uc?export=download&id=${fileId}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-xs bg-[#0038A8] text-white px-3 py-1.5 rounded-lg hover:bg-[#002b80] transition-colors shadow-sm"
+                                        >
+                                            Download PDF
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         ) : (
@@ -948,7 +970,8 @@ const CitizensCharter = () => {
                                     onClick={() => setShowDeleteConfirm(false)}
                                     className="flex-1 px-4 py-3 rounded-xl font-bold border border-slate-200 text-slate-600 uppercase text-xs hover:bg-slate-50 transition-all"
                                 >
-                                    Cancel                                </button>
+                                    Cancel
+                                </button>
                                 <button
                                     onClick={() => handleDelete(handbookToDelete._id)}
                                     className="flex-1 px-4 py-3 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 transition-all uppercase text-xs flex items-center justify-center gap-2 tracking-widest"

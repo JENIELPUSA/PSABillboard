@@ -1,4 +1,4 @@
-import isoLogo from "../../assets/ISO 9001.png";
+import isoLogo from "../../assets/LatestLogo.png";
 
 const ISOFooter = () => {
     return (
