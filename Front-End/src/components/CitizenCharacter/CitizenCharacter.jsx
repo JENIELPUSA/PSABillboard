@@ -197,8 +197,8 @@ const FloatingAvatar = ({
                     {/* Peeking Character (Nagtatago sa likod ng pader / sumisilip) */}
                     <div
                         className={`absolute bottom-10 transition-all duration-500 ease-out z-10 flex flex-col items-center ${isPeekingOut
-                                ? '-translate-y-12 rotate-0'
-                                : 'translate-y-10 rotate-12 group-hover:translate-y-4 group-hover:rotate-6'
+                            ? '-translate-y-12 rotate-0'
+                            : 'translate-y-10 rotate-12 group-hover:translate-y-4 group-hover:rotate-6'
                             }`}
                     >
                         {/* 3D Circular Avatar Head */}
@@ -240,12 +240,12 @@ const FloatingAvatar = ({
                             {/* Mouth */}
                             <div
                                 className={`transition-all duration-300 border-slate-900 ${!isPeekingOut
-                                        ? 'w-4 h-2 border-b-3 rounded-b-full bg-slate-900'
-                                        : isWaving
-                                            ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-xl relative overflow-hidden'
-                                            : expression === 'excited'
-                                                ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-full'
-                                                : 'w-5 h-2.5 border-b-3 rounded-b-full'
+                                    ? 'w-4 h-2 border-b-3 rounded-b-full bg-slate-900'
+                                    : isWaving
+                                        ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-xl relative overflow-hidden'
+                                        : expression === 'excited'
+                                            ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-full'
+                                            : 'w-5 h-2.5 border-b-3 rounded-b-full'
                                     }`}
                             />
 
@@ -864,8 +864,8 @@ const CitizensCharter = () => {
                     {/* Header */}
                     <div
                         className={`sticky top-0 z-10 relative p-5 sm:p-6 flex justify-between items-center text-white ${isEditing || isNewCard && editingId
-                                ? 'bg-gradient-to-r from-amber-600 to-amber-700'
-                                : 'bg-gradient-to-r from-[#0038A8] to-[#002b80]'
+                            ? 'bg-gradient-to-r from-amber-600 to-amber-700'
+                            : 'bg-gradient-to-r from-[#0038A8] to-[#002b80]'
                             }`}
                     >
                         <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -1022,8 +1022,8 @@ const CitizensCharter = () => {
                             <button
                                 type="submit"
                                 className={`flex-1 px-4 py-3.5 rounded-xl font-bold text-white transition-all uppercase text-xs flex items-center justify-center gap-2 shadow-lg ${isEditing || isNewCard && editingId
-                                        ? 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700'
-                                        : 'bg-gradient-to-r from-[#0038A8] to-[#002b80] hover:from-[#CE1126]'
+                                    ? 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700'
+                                    : 'bg-gradient-to-r from-[#0038A8] to-[#002b80] hover:from-[#CE1126]'
                                     }`}
                             >
                                 <Send size={16} />
@@ -1142,13 +1142,13 @@ const CitizensCharter = () => {
             )}
 
             <main className="w-full p-6 md:p-10 flex flex-col gap-8 max-w-[1600px] mx-auto">
-               <section className="w-full bg-gradient-to-br from-[#0038A8] to-[#002b80] rounded-[2.5rem] py-16 px-8 text-center text-white shadow-xl relative overflow-hidden">
-    <div className="relative z-10">
-        <h1 className="text-[clamp(4rem,8vw,7rem)] font-black leading-none mb-4 tracking-tighter uppercase">
-            CITIZEN'S<span className="text-[#FCD116]"> CHARTER</span>
-        </h1>
-    </div>
-</section>
+                <section className="w-full bg-gradient-to-br from-[#0038A8] to-[#002b80] rounded-[2.5rem] py-16 px-8 text-center text-white shadow-xl relative overflow-hidden">
+                    <div className="relative z-10">
+                        <h1 className="text-[clamp(4rem,8vw,7rem)] font-black leading-none mb-4 tracking-tighter uppercase">
+                            CITIZEN'S<span className="text-[#FCD116]"> CHARTER</span>
+                        </h1>
+                    </div>
+                </section>
 
                 {/* QMS CORNERS GRID SECTION */}
                 <section className="w-full space-y-8">
@@ -1563,7 +1563,7 @@ const CitizensCharter = () => {
 
                                                         <div className="flex items-start gap-2">
                                                             <File size={16} className="text-[#0038A8] mt-0.5 flex-shrink-0" />
-                                                            <p className="text-slate-600 text-sm leading-relaxed font-medium line-clamp-3">
+                                                            <p className="text-slate-600 text-sm leading-relaxed font-medium">
                                                                 {item.description || "No description available"}
                                                             </p>
                                                         </div>
