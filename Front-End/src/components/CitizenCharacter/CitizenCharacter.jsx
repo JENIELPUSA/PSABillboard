@@ -1,4 +1,4 @@
-// CitizensCharter.jsx
+// CitizensCharter.jsx - Floating Avatar sa Right Side na may Timer Loop (Original Style)
 import React, { useState, useEffect, useContext } from 'react';
 import {
     MonitorOff,
@@ -21,7 +21,9 @@ import {
     EyeOff,
     PlusCircle,
     Grid,
-    List
+    List,
+    Menu,
+    Clock
 } from 'lucide-react';
 import PDFIcon from '../../assets/PDFIcon.webp';
 import { AuthContext } from '../../contexts/AuthContext';
@@ -29,11 +31,316 @@ import ISOFooter from '../ISOFooter/Isofooter';
 import { QmsCornerContext } from '../../contexts/QmsContext';
 import PDFViewCard from './PDFViewCard';
 
+
 // Assets
 import asset1 from "../../assets/assets1.jpeg";
 import asset2 from "../../assets/assets2.jpeg";
 import asset3 from "../../assets/assets3.jpeg";
 import asset4 from "../../assets/assets4.jpeg";
+
+// ============================================================
+// FLOATING AVATAR SA RIGHT SIDE - ORIGINAL STYLE WITH TIMER LOOP
+// ============================================================
+const FloatingAvatar = ({ 
+    userName = "Citizen's Charter Guide", 
+    userRole = "Public Assistance & Information", 
+    userStatus = "online", 
+    introTexts = [
+        "Hi! Welcome to Our Citizen's Charter! 👋",
+        "Explore our services and documents! 📋",
+        "Need assistance? We're here to help! 💙",
+        "Check out our QMS Corners! 📚",
+        "Have a great day! 🌟",
+        "Your feedback matters to us! 💬",
+        "Transparency and accountability! 🏛️",
+        "We serve with excellence! ⭐"
+    ]
+}) => {
+    const [isPeekingOut, setIsPeekingOut] = useState(false);
+    const [isWaving, setIsWaving] = useState(false);
+    const [characterColor, setCharacterColor] = useState('bg-amber-400');
+    const [expression, setExpression] = useState('happy');
+    const [soundEnabled, setSoundEnabled] = useState(true);
+    const [voiceEnabled, setVoiceEnabled] = useState(false);
+    const [currentTextIndex, setCurrentTextIndex] = useState(0);
+    const [countdown, setCountdown] = useState(8);
+
+    const playPopSound = (freq = 520, duration = 0.15) => {
+        if (!soundEnabled) return;
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            const ctx = new AudioCtx();
+
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(freq * 1.8, ctx.currentTime + duration);
+
+            gain.gain.setValueAtTime(0.3, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    const speakText = (text) => {
+        if (!voiceEnabled || !('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.1;
+        utterance.lang = 'tl-PH';
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const triggerPeekAndWave = () => {
+        // Random expression
+        const expressions = ['happy', 'excited', 'cool', 'thinking'];
+        setExpression(expressions[Math.floor(Math.random() * expressions.length)]);
+        
+        // Random text
+        const randomIndex = Math.floor(Math.random() * introTexts.length);
+        setCurrentTextIndex(randomIndex);
+        
+        setIsPeekingOut(true);
+        setIsWaving(true);
+        playPopSound(580 + Math.random() * 100, 0.2);
+        speakText(introTexts[randomIndex]);
+
+        setTimeout(() => {
+            setIsWaving(false);
+        }, 1800);
+
+        // Hide after 4 seconds
+        setTimeout(() => {
+            setIsPeekingOut(false);
+        }, 4000);
+    };
+
+    // Timer Loop - every 8 seconds
+    useEffect(() => {
+        const initialTimer = setTimeout(() => {
+            triggerPeekAndWave();
+            setCountdown(8);
+        }, 1000);
+
+        const intervalId = setInterval(() => {
+            triggerPeekAndWave();
+            setCountdown(8);
+        }, 8000);
+
+        const countdownIntervalId = setInterval(() => {
+            setCountdown(prev => {
+                if (prev <= 1) return 8;
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => {
+            clearTimeout(initialTimer);
+            clearInterval(intervalId);
+            clearInterval(countdownIntervalId);
+        };
+    }, []);
+
+    const togglePeek = () => {
+        if (isPeekingOut) {
+            setIsPeekingOut(false);
+            setIsWaving(false);
+            playPopSound(350, 0.12);
+        } else {
+            triggerPeekAndWave();
+        }
+    };
+
+    const statusColors = {
+        online: 'bg-emerald-500 border-slate-900',
+        busy: 'bg-rose-500 border-slate-900',
+        away: 'bg-amber-400 border-slate-900',
+    };
+
+    return (
+        <div className="fixed right-6 bottom-8 z-[100] flex flex-col items-end">
+            {/* Timer Indicator */}
+            <div className="mb-2 flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md border border-slate-200">
+                <Clock size={14} className="text-[#0038A8] animate-pulse" />
+                <span className="text-xs font-bold text-[#0038A8]">
+                    Next peek in: <span className="text-amber-600">{countdown}s</span>
+                </span>
+                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                    <div 
+                        className="h-full bg-gradient-to-r from-[#0038A8] to-amber-400 rounded-full transition-all duration-1000"
+                        style={{ width: `${(countdown / 8) * 100}%` }}
+                    />
+                </div>
+            </div>
+
+            {/* ORIGINAL AVATAR STYLE - With Barrier Wall / Desk */}
+            <div className="relative flex flex-col items-center">
+                {/* Dynamic Speech Bubble */}
+                <div 
+                    className={`absolute -top-24 right-1/2 translate-x-1/2 bg-white text-slate-900 font-black text-xs sm:text-sm px-5 py-3 rounded-2xl border-3 border-slate-900 shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] transition-all duration-500 z-40 w-72 text-center leading-snug ${
+                        isPeekingOut ? 'opacity-100 scale-100 -translate-y-2' : 'opacity-0 scale-50 translate-y-6 pointer-events-none'
+                    }`}
+                >
+                    <div className="text-[10px] uppercase font-black tracking-widest text-amber-600 mb-0.5 flex items-center justify-center gap-2">
+                        <span>🏛️ CITIZEN'S CHARTER</span>
+                        <span className="text-[8px] text-slate-400 animate-pulse">● LIVE</span>
+                    </div>
+                    <div className="flex items-center justify-center gap-2">
+                        <span>{introTexts[currentTextIndex]}</span>
+                    </div>
+
+                    {/* Bubble Tail */}
+                    <div className="absolute -bottom-3 right-1/2 translate-x-1/2 w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-t-[10px] border-t-slate-900" />
+                </div>
+
+                {/* Peeking Avatar Container with Barrier Wall */}
+                <div 
+                    className="relative w-80 h-48 flex items-end justify-center cursor-pointer group"
+                    onClick={triggerPeekAndWave}
+                >
+                    {/* Peeking Character (Nagtatago sa likod ng pader / sumisilip) */}
+                    <div 
+                        className={`absolute bottom-10 transition-all duration-500 ease-out z-10 flex flex-col items-center ${
+                            isPeekingOut 
+                                ? '-translate-y-12 rotate-0' 
+                                : 'translate-y-10 rotate-12 group-hover:translate-y-4 group-hover:rotate-6'
+                        }`}
+                    >
+                        {/* 3D Circular Avatar Head */}
+                        <div className={`w-32 h-32 ${characterColor} rounded-full border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] relative flex flex-col items-center justify-center overflow-visible`}>
+                            
+                            {/* Eyes */}
+                            <div className="flex gap-2.5 mb-1 z-10">
+                                <div className="w-7 h-9 bg-white rounded-full border-3 border-slate-900 relative flex items-center justify-center overflow-hidden">
+                                    {!isPeekingOut ? (
+                                        <div className="w-3 h-3 bg-slate-900 rounded-full absolute top-1 left-2" />
+                                    ) : expression === 'cool' ? (
+                                        <div className="w-full h-4 bg-slate-900 absolute top-2" />
+                                    ) : expression === 'thinking' ? (
+                                        <div className="w-3 h-3 bg-slate-900 rounded-full absolute top-1 left-2" />
+                                    ) : (
+                                        <>
+                                            <div className={`w-3 h-3 bg-slate-900 rounded-full absolute ${isWaving ? 'top-1 left-2 scale-110' : 'top-2 left-1'}`} />
+                                            <div className="w-1 h-1 bg-white rounded-full absolute top-2 left-1.5" />
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="w-7 h-9 bg-white rounded-full border-3 border-slate-900 relative flex items-center justify-center overflow-hidden">
+                                    {!isPeekingOut ? (
+                                        <div className="w-3 h-3 bg-slate-900 rounded-full absolute top-1 left-1" />
+                                    ) : expression === 'cool' ? (
+                                        <div className="w-full h-4 bg-slate-900 absolute top-2" />
+                                    ) : expression === 'thinking' ? (
+                                        <div className="w-3 h-3 bg-slate-900 rounded-full absolute top-1 left-1" />
+                                    ) : (
+                                        <>
+                                            <div className={`w-3 h-3 bg-slate-900 rounded-full absolute ${isWaving ? 'top-1 left-2 scale-110' : 'top-2 left-1'}`} />
+                                            <div className="w-1 h-1 bg-white rounded-full absolute top-2 left-1.5" />
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Mouth */}
+                            <div 
+                                className={`transition-all duration-300 border-slate-900 ${
+                                    !isPeekingOut
+                                        ? 'w-4 h-2 border-b-3 rounded-b-full bg-slate-900'
+                                        : isWaving 
+                                        ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-xl relative overflow-hidden' 
+                                        : expression === 'excited'
+                                        ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-full'
+                                        : 'w-5 h-2.5 border-b-3 rounded-b-full'
+                                }`}
+                            />
+
+                            {/* Waving Hand Pop-out */}
+                            <div 
+                                className={`absolute -left-3 top-8 w-9 h-9 ${characterColor} border-3 border-slate-900 rounded-full shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] origin-bottom-right transition-all z-20 ${
+                                    isWaving ? 'animate-wave-right' : 'group-hover:-rotate-12'
+                                }`}
+                            >
+                                <div className={`w-2.5 h-2.5 ${characterColor} border-2 border-slate-900 rounded-full absolute -top-1 right-0.5`} />
+                            </div>
+
+                            {/* Status Dot Badge */}
+                            <div 
+                                className={`absolute bottom-0 left-1 w-6 h-6 ${statusColors[userStatus]} border-3 rounded-full shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] z-30`}
+                                title={`Status: ${userStatus}`}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Peeking Barrier Wall / Desk (Pader kung saan sumisilip ang avatar) */}
+                    <div className="w-full bg-amber-300 border-4 border-slate-900 rounded-2xl py-3 px-4 shadow-[6px_6px_0px_0px_rgba(15,23,42,1)] z-20 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="text-lg">🏛️</span>
+                            <div>
+                                <h3 className="font-black text-sm text-slate-900 leading-none">{userName}</h3>
+                                <p className="text-[10px] font-bold text-slate-700 uppercase tracking-wider mt-0.5">{userRole}</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                            {/* Timer Badge */}
+                            <div className="flex items-center gap-1 bg-white/80 px-2 py-1 rounded-lg border border-slate-200">
+                                <Clock size={12} className="text-[#0038A8]" />
+                                <span className="text-[10px] font-bold text-[#0038A8]">{countdown}s</span>
+                            </div>
+
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    togglePeek();
+                                }}
+                                className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-900 text-xs font-black rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] active:translate-y-0.5 transition-all"
+                            >
+                                {isPeekingOut ? '🙈 Magtago' : '👀 Sumilip!'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* CSS Wave Keyframe Animations */}
+            <style>{`
+                @keyframes wave {
+                    0% { transform: rotate(0deg); }
+                    15% { transform: rotate(28deg); }
+                    30% { transform: rotate(-25deg); }
+                    45% { transform: rotate(22deg); }
+                    60% { transform: rotate(-18deg); }
+                    75% { transform: rotate(10deg); }
+                    100% { transform: rotate(0deg); }
+                }
+                @keyframes wave-right {
+                    0% { transform: rotate(0deg); }
+                    15% { transform: rotate(28deg); }
+                    30% { transform: rotate(-25deg); }
+                    45% { transform: rotate(22deg); }
+                    60% { transform: rotate(-18deg); }
+                    75% { transform: rotate(10deg); }
+                    100% { transform: rotate(0deg); }
+                }
+                .animate-wave-right {
+                    animation: wave-right 1.2s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+                }
+            `}</style>
+        </div>
+    );
+};
 
 const CitizensCharter = () => {
     const [isMobile, setIsMobile] = useState(false);
@@ -762,6 +1069,23 @@ const CitizensCharter = () => {
 
     return (
         <div className="relative min-h-screen bg-[#f8fafc] font-sans pb-20 overflow-x-hidden">
+            {/* --- FLOATING AVATAR - Right Side with Timer Loop (Original Style) --- */}
+            <FloatingAvatar 
+                userName="Citizen's Charter Guide"
+                userRole="Public Assistance & Information"
+                userStatus="online"
+                introTexts={[
+                    "Hi! Welcome to Our Citizen's Charter! 👋",
+                    "Explore our services and documents! 📋",
+                    "Need assistance? We're here to help! 💙",
+                    "Check out our QMS Corners! 📚",
+                    "Have a great day! 🌟",
+                    "Your feedback matters to us! 💬",
+                    "Transparency and accountability! 🏛️",
+                    "We serve with excellence! ⭐"
+                ]}
+            />
+
             {/* --- TOAST NOTIFICATION --- */}
             {showToast && (
                 <div className="fixed top-5 right-5 z-[200] animate-in slide-in-from-right duration-300">
@@ -945,9 +1269,8 @@ const CitizensCharter = () => {
                         </div>
                     ) : (
                         <>
-                            {/* Conditionally render grid or list view */}
                             {viewMode === 'grid' ? (
-                                // GRID VIEW - with document cards in a grid
+                                // GRID VIEW
                                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                     {/* Render Flip Card Form if any card is flipped */}
                                     {renderFlipCardForm()}
@@ -1129,7 +1452,7 @@ const CitizensCharter = () => {
                                     })}
                                 </div>
                             ) : (
-                                // LIST VIEW - LEFT AND RIGHT LAYOUT with 3 Grid
+                                // LIST VIEW
                                 <div className="space-y-4">
                                     {/* Render Flip Card Form if any card is flipped */}
                                     {renderFlipCardForm()}
@@ -1142,7 +1465,7 @@ const CitizensCharter = () => {
                                         />
                                     )}
 
-                                    {/* Render QMS Cards in List View with Left/Right Layout */}
+                                    {/* Render QMS Cards in List View */}
                                     {qmsCorners.map((item) => {
                                         if (flippedCardId === item._id || flippedDocumentCard === item._id) return null;
 
@@ -1185,7 +1508,7 @@ const CitizensCharter = () => {
                                                                 )}
                                                             </div>
                                                             
-                                                            {/* Document Grid - 3 columns only */}
+                                                            {/* Document Grid - 3 columns */}
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 {links.map((link, index) => {
                                                                     const isVisible = isDocumentVisible(item._id, index);
@@ -1406,9 +1729,9 @@ const CitizensCharter = () => {
             {isAdmin && (
                 <button
                     onClick={openCardForAdd}
-                    className="fixed bottom-8 right-8 w-16 h-16 bg-[#0038A8] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[#CE1126] transition-all duration-300 z-50 group hover:scale-110 border-4 border-white"
+                    className="fixed bottom-32 right-8 w-14 h-14 bg-[#0038A8] text-white rounded-full shadow-2xl flex items-center justify-center hover:bg-[#CE1126] transition-all duration-300 z-50 group hover:scale-110 border-4 border-white"
                 >
-                    <Plus size={32} className="group-hover:rotate-90 transition-transform duration-300" />
+                    <Plus size={28} className="group-hover:rotate-90 transition-transform duration-300" />
                 </button>
             )}
 
