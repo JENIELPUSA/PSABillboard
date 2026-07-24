@@ -1,3 +1,4 @@
+// CitizensCharter.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import {
     MonitorOff,
@@ -29,6 +30,7 @@ import { ImageCarousel } from "../ImageCarousel/ImageCarousel";
 import { AuthContext } from '../../contexts/AuthContext';
 import ISOFooter from '../ISOFooter/Isofooter';
 import { QmsCornerContext } from '../../contexts/QmsContext';
+import PopupModal from './PopupModal'; // Import the new modal component
 import psa_logo from "../../assets/psa-logo.mp4"
 
 // Assets
@@ -87,7 +89,7 @@ const CitizensCharter = () => {
     const [viewingDocument, setViewingDocument] = useState(null);
 
     // ===== NEW: View/Hide Documents per Card =====
-    const [hiddenDocuments, setHiddenDocuments] = useState(new Set()); // Stores hidden document links by index
+    const [hiddenDocuments, setHiddenDocuments] = useState(new Set());
 
     // Search input local state
     const [localSearchTerm, setLocalSearchTerm] = useState("");
@@ -127,7 +129,7 @@ const CitizensCharter = () => {
     };
 
     // =========================
-    // FETCH ON COMPONENT MOUNT - EVERY DISPLAY
+    // FETCH ON COMPONENT MOUNT
     // =========================
     useEffect(() => {
         FetchQmsCorners("Citizen Character");
@@ -372,12 +374,10 @@ const CitizensCharter = () => {
     };
 
     // ===== NEW: View/Hide Document Links Functions =====
-    // Generate unique key for each document link
     const getDocumentKey = (cardId, linkIndex) => {
         return `${cardId}-${linkIndex}`;
     };
 
-    // Toggle individual document visibility
     const toggleDocumentVisibility = (cardId, linkIndex) => {
         const key = getDocumentKey(cardId, linkIndex);
         const newHiddenSet = new Set(hiddenDocuments);
@@ -389,12 +389,10 @@ const CitizensCharter = () => {
         setHiddenDocuments(newHiddenSet);
     };
 
-    // Toggle all documents in a specific card
     const toggleAllDocumentsInCard = (cardId, linkCount) => {
         const newHiddenSet = new Set(hiddenDocuments);
         let allHidden = true;
         
-        // Check if all documents in this card are hidden
         for (let i = 0; i < linkCount; i++) {
             const key = getDocumentKey(cardId, i);
             if (!newHiddenSet.has(key)) {
@@ -404,13 +402,11 @@ const CitizensCharter = () => {
         }
         
         if (allHidden) {
-            // Show all documents in this card (remove from hidden set)
             for (let i = 0; i < linkCount; i++) {
                 const key = getDocumentKey(cardId, i);
                 newHiddenSet.delete(key);
             }
         } else {
-            // Hide all documents in this card (add to hidden set)
             for (let i = 0; i < linkCount; i++) {
                 const key = getDocumentKey(cardId, i);
                 newHiddenSet.add(key);
@@ -419,18 +415,15 @@ const CitizensCharter = () => {
         setHiddenDocuments(newHiddenSet);
     };
 
-    // Check if a document is visible
     const isDocumentVisible = (cardId, linkIndex) => {
         const key = getDocumentKey(cardId, linkIndex);
         return !hiddenDocuments.has(key);
     };
 
-    // Get visible documents for a specific card
     const getVisibleDocumentsForCard = (cardId, links) => {
         return links.filter((_, index) => isDocumentVisible(cardId, index));
     };
 
-    // Get count of visible documents in a card
     const getVisibleCount = (cardId, links) => {
         return links.filter((_, index) => isDocumentVisible(cardId, index)).length;
     };
@@ -706,7 +699,6 @@ const CitizensCharter = () => {
             )}
 
             <main className="w-full p-6 md:p-10 flex flex-col gap-8 max-w-[1600px] mx-auto">
-
                 <section className="w-full bg-gradient-to-br from-[#0038A8] to-[#002b80] rounded-[2.5rem] py-16 px-8 text-center text-white shadow-xl relative overflow-hidden">
                     <div className="relative z-10">
                         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-white/20">
@@ -714,7 +706,7 @@ const CitizensCharter = () => {
                             <span>Republic of the Philippines • PSA</span>
                         </div>
                         <h1 className="text-[clamp(2.5rem,5vw,4.5rem)] font-black leading-none mb-4 tracking-tighter uppercase">
-                            CITIZEN <span className="text-[#FCD116]">CHARTER</span>
+                            CITIZEN'S<span className="text-[#FCD116]"> CHARTER</span>
                         </h1>
                         <p className="text-white/80 text-lg font-medium max-w-2xl mx-auto">
                             Quality Management System • 5S • Citizen Character • GAD Corner
@@ -796,9 +788,6 @@ const CitizensCharter = () => {
                         </div>
                     ) : (
                         <>
-                            {/* ============================================ */}
-                            {/* GRIDVIEW DISPLAY FOR DOCUMENTS */}
-                            {/* ============================================ */}
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {qmsCorners.map((item) => {
                                     const links = parseLinks(item.subtitle);
@@ -810,7 +799,6 @@ const CitizensCharter = () => {
 
                                     return (
                                         <div key={item._id} className="group relative flex flex-col overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1 h-full">
-                                            {/* Category Badge - Top */}
                                             {item.category && item.category !== "QMS corner" && (
                                                 <div className="mb-3">
                                                     <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getCategoryColor(item.category)}`}>
@@ -819,12 +807,10 @@ const CitizensCharter = () => {
                                                 </div>
                                             )}
 
-                                            {/* Title - QMS DOCUMENT style */}
                                             <h3 className="text-[#0038A8] font-black text-xl leading-tight uppercase tracking-tight group-hover:text-[#002b80] transition-colors line-clamp-2 mb-1">
                                                 {item.title}
                                             </h3>
 
-                                            {/* Description - DOCUMENTS: style */}
                                             <div className="flex items-start gap-2 mb-3">
                                                 <File size={16} className="text-[#0038A8] mt-0.5 flex-shrink-0" />
                                                 <p className="text-slate-600 text-sm leading-relaxed font-medium line-clamp-2">
@@ -832,7 +818,6 @@ const CitizensCharter = () => {
                                                 </p>
                                             </div>
 
-                                            {/* DOCUMENTS: Section - with View/Hide Controls */}
                                             {hasLinks && (
                                                 <div className="mt-auto">
                                                     <div className="flex items-center justify-between gap-2 text-xs text-slate-500 font-medium mb-2">
@@ -844,7 +829,6 @@ const CitizensCharter = () => {
                                                             </span>
                                                         </div>
                                                         
-                                                        {/* Toggle all documents in this card */}
                                                         {isAdmin && totalLinks > 0 && (
                                                             <button
                                                                 onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
@@ -860,7 +844,6 @@ const CitizensCharter = () => {
                                                         {links.map((link, index) => {
                                                             const isVisible = isDocumentVisible(item._id, index);
                                                             
-                                                            // Skip rendering if document is hidden
                                                             if (!isVisible) return null;
                                                             
                                                             return link.fileId ? (
@@ -871,7 +854,6 @@ const CitizensCharter = () => {
                                                                 >
                                                                     <span>* {link.title || `Document ${index + 1}`}</span>
                                                                     
-                                                                    {/* Individual hide button for each document */}
                                                                     {isAdmin && (
                                                                         <button
                                                                             onClick={(e) => {
@@ -895,7 +877,6 @@ const CitizensCharter = () => {
                                                                 >
                                                                     <span>* {link.title || `Document ${index + 1}`}</span>
                                                                     
-                                                                    {/* Individual hide button for each document */}
                                                                     {isAdmin && (
                                                                         <button
                                                                             onClick={(e) => {
@@ -914,7 +895,6 @@ const CitizensCharter = () => {
                                                         })}
                                                     </div>
 
-                                                    {/* Show message if all documents are hidden */}
                                                     {visibleCount === 0 && (
                                                         <div className="text-sm text-slate-400 italic flex items-center gap-2 py-1">
                                                             <EyeOff size={14} />
@@ -932,14 +912,12 @@ const CitizensCharter = () => {
                                                 </div>
                                             )}
 
-                                            {/* Date Added */}
                                             <div className={`${hasLinks ? 'mt-4' : 'mt-auto pt-3'} border-t border-slate-100 flex items-center justify-between`}>
                                                 <div className="flex items-center gap-2 text-xs text-slate-400">
                                                     <Calendar size={12} />
                                                     <span>Added: {formatDate(item.createdAt)}</span>
                                                 </div>
 
-                                                {/* Admin Actions */}
                                                 {isAdmin && (
                                                     <div className="flex gap-1">
                                                         <button
@@ -1048,118 +1026,18 @@ const CitizensCharter = () => {
                 </button>
             )}
 
-            {/* UNIFIED MODAL FOR ADD/EDIT */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 overflow-y-auto">
-                    <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-slate-200 animate-in zoom-in-95 duration-200 my-8">
-                        <div className={`p-6 flex justify-between items-center text-white ${editingId ? 'bg-amber-600' : 'bg-[#0038A8]'}`}>
-                            <div className="flex items-center gap-2">
-                                <FileText size={20} className="text-[#FCD116]" />
-                                <h3 className="font-black uppercase tracking-tight text-sm">{editingId ? "Update QMS Corner" : "Post New QMS Corner"}</h3>
-                            </div>
-                            <button
-                                onClick={closeModal}
-                                className="hover:bg-white/20 p-1.5 rounded-full transition-colors"
-                            >
-                                <X size={24} />
-                            </button>
-                        </div>
-                        <form className="p-8 space-y-5 max-h-[70vh] overflow-y-auto" onSubmit={handleSubmit}>
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Document Title</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    className="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 outline-none transition-all font-medium focus:ring-4 focus:ring-blue-100"
-                                    placeholder="Enter document title"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Summary / Description</label>
-                                <textarea
-                                    rows="3"
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full px-5 py-4 rounded-2xl border border-slate-200 bg-slate-50 outline-none resize-none transition-all font-medium focus:ring-4 focus:ring-blue-100"
-                                    placeholder="Enter description"
-                                />
-                            </div>
-
-                            {/* Multiple Links Section */}
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Document Links</label>
-                                    <button
-                                        type="button"
-                                        onClick={addLinkField}
-                                        className="flex items-center gap-1 text-[#0038A8] hover:text-[#CE1126] text-xs font-bold transition-colors"
-                                    >
-                                        <PlusCircle size={16} /> Add Link
-                                    </button>
-                                </div>
-
-                                {formData.links.map((link, index) => (
-                                    <div key={index} className="flex gap-3 items-start bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                                        <div className="flex-1 space-y-3">
-                                            <div>
-                                                <label className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Link Title</label>
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    value={link.title}
-                                                    onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white outline-none transition-all text-sm font-medium focus:ring-4 focus:ring-blue-100"
-                                                    placeholder="e.g., View Document, Download PDF, etc."
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-[8px] font-bold text-slate-400 uppercase tracking-wider">Google Drive URL</label>
-                                                <input
-                                                    type="url"
-                                                    required
-                                                    value={link.url}
-                                                    onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                                                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white outline-none transition-all text-sm font-medium focus:ring-4 focus:ring-blue-100"
-                                                    placeholder="https://drive.google.com/file/d/..."
-                                                />
-                                                <p className="text-[10px] text-slate-400 mt-1">Paste the full Google Drive file URL</p>
-                                            </div>
-                                        </div>
-                                        {formData.links.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeLinkField(index)}
-                                                className="mt-1 p-2 text-red-500 hover:bg-red-50 rounded-xl transition-colors shrink-0"
-                                            >
-                                                <Trash size={18} />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="pt-4 flex gap-4">
-                                <button
-                                    type="button"
-                                    onClick={closeModal}
-                                    className="flex-1 px-4 py-4 rounded-2xl font-black border border-slate-200 text-slate-500 uppercase text-[11px] hover:bg-slate-50 transition-all"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className={`flex-1 px-4 py-4 rounded-2xl font-black text-white transition-all uppercase text-[11px] flex items-center justify-center gap-2 shadow-lg ${editingId ? 'bg-amber-600 hover:bg-amber-700' : 'bg-[#0038A8] hover:bg-[#CE1126]'}`}
-                                >
-                                    <Send size={14} /> {editingId ? "Save Changes" : "Post Document"}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+            {/* UNIFIED MODAL FOR ADD/EDIT - Now using PopupModal component */}
+            <PopupModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={handleSubmit}
+                editingId={editingId}
+                formData={formData}
+                setFormData={setFormData}
+                handleLinkChange={handleLinkChange}
+                addLinkField={addLinkField}
+                removeLinkField={removeLinkField}
+            />
 
             {/* ISO Footer */}
             <ISOFooter />
