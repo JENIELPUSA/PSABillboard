@@ -25,7 +25,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 
 // Assets
 import bannerVideo from "../../assets/banner.mp4";
-import isoLogo from "../../assets/ISO 9001.png";
+import isoLogo from "../../assets/LatestLogo.png";
 import pledge2024 from "../../assets/PLEDGE OF COMMITMENT 2024.jpg";
 import pledge2025 from "../../assets/PLEDGE OF COMMITMENT 2025.jpg";
 import asset1 from "../../assets/assets1.jpeg";

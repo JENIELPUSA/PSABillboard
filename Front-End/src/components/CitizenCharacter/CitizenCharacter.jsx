@@ -16,34 +16,30 @@ import {
     ChevronRight,
     Search,
     Eye,
-    Link2,
-    Trash,
-    PlusCircle,
     Calendar,
     File,
     EyeOff,
-    ChevronDown,
-    ChevronUp,
-    RotateCcw
+    PlusCircle,
+    Grid,
+    List
 } from 'lucide-react';
-import { Banner } from '../Banner/Banner';
-import { ImageCarousel } from "../ImageCarousel/ImageCarousel";
+import PDFIcon from '../../assets/PDFIcon.webp';
 import { AuthContext } from '../../contexts/AuthContext';
 import ISOFooter from '../ISOFooter/Isofooter';
 import { QmsCornerContext } from '../../contexts/QmsContext';
-import psa_logo from "../../assets/psa-logo.mp4"
+import PDFViewCard from './PDFViewCard';
 
 // Assets
 import asset1 from "../../assets/assets1.jpeg";
 import asset2 from "../../assets/assets2.jpeg";
 import asset3 from "../../assets/assets3.jpeg";
 import asset4 from "../../assets/assets4.jpeg";
-import bannerVideo from "../../assets/banner.mp4";
 
 const CitizensCharter = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedDocument, setSelectedDocument] = useState(null);
+    const [viewMode, setViewMode] = useState('list');
 
     // Get QMS Context
     const {
@@ -66,15 +62,13 @@ const CitizensCharter = () => {
 
     // Get auth context for role
     const { role } = useContext(AuthContext);
-
-    // Check if user is admin
     const isAdmin = role === "admin";
 
-    // --- LOCAL PAGINATION STATE (FOR DISPLAY ONLY) ---
+    // --- LOCAL PAGINATION STATE ---
     const [localCurrentPage, setLocalCurrentPage] = useState(1);
 
     // --- STATES PARA SA FLIP CARD FORM ---
-    const [flippedCardId, setFlippedCardId] = useState(null); // Track which card is flipped
+    const [flippedCardId, setFlippedCardId] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMsg, setToastMsg] = useState("");
@@ -84,11 +78,11 @@ const CitizensCharter = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [handbookToDelete, setHandbookToDelete] = useState(null);
 
-    // ===== NEW: Flip Card for Document Viewing =====
-    const [flippedDocumentCard, setFlippedDocumentCard] = useState(null); // Track which document card is flipped
+    // Flip Card for Document Viewing
+    const [flippedDocumentCard, setFlippedDocumentCard] = useState(null);
     const [viewingDocument, setViewingDocument] = useState(null);
 
-    // ===== NEW: View/Hide Documents per Card =====
+    // View/Hide Documents per Card
     const [hiddenDocuments, setHiddenDocuments] = useState(new Set());
 
     // Search input local state
@@ -271,7 +265,7 @@ const CitizensCharter = () => {
     // =========================
     const openCardForAdd = () => {
         cleanFormData();
-        setFlippedCardId('new'); // Special ID for new card
+        setFlippedCardId('new');
     };
 
     const openCardForEdit = (handbook) => {
@@ -350,7 +344,7 @@ const CitizensCharter = () => {
         cleanFormData();
     };
 
-    // ===== NEW: Flip Document Card Functions =====
+    // ===== Flip Document Card Functions (uses PDFViewCard) =====
     const flipDocumentCard = (item, linkToView = null) => {
         const links = parseLinks(item.subtitle);
         if (linkToView) {
@@ -372,7 +366,7 @@ const CitizensCharter = () => {
         setViewingDocument(null);
     };
 
-    // ===== NEW: View/Hide Document Links Functions =====
+    // ===== View/Hide Document Links Functions =====
     const getDocumentKey = (cardId, linkIndex) => {
         return `${cardId}-${linkIndex}`;
     };
@@ -567,7 +561,7 @@ const CitizensCharter = () => {
         return date.toISOString().split('T')[0];
     };
 
-    // Render the flip card form - PINATAAS ANG HEIGHT
+    // Render the flip card form
     const renderFlipCardForm = () => {
         const isNewCard = flippedCardId === 'new';
         const isEditing = !!editingId && !isNewCard;
@@ -578,7 +572,7 @@ const CitizensCharter = () => {
         return (
             <div className="col-span-1 md:col-span-2 xl:col-span-3">
                 <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-[#0038A8] overflow-hidden animate-in slide-in-from-bottom duration-300 max-h-[95vh] overflow-y-auto">
-                    {/* Header - STICKY */}
+                    {/* Header */}
                     <div
                         className={`sticky top-0 z-10 relative p-5 sm:p-6 flex justify-between items-center text-white ${
                             isEditing || isNewCard && editingId
@@ -586,7 +580,6 @@ const CitizensCharter = () => {
                                 : 'bg-gradient-to-r from-[#0038A8] to-[#002b80]'
                         }`}
                     >
-                        {/* Background Pattern */}
                         <div className="absolute inset-0 opacity-10 pointer-events-none">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/3"></div>
                             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/4"></div>
@@ -596,15 +589,12 @@ const CitizensCharter = () => {
                             <div className="p-2.5 bg-white/20 rounded-2xl backdrop-blur-sm">
                                 <FileText size={24} className="text-[#FCD116]" />
                             </div>
-
                             <div>
                                 <h3 className="font-black uppercase tracking-tight text-lg sm:text-xl">
                                     {isEditing ? 'Update QMS Corner' : 'Post New QMS Corner'}
                                 </h3>
                                 <p className="text-white/80 text-xs font-medium mt-0.5">
-                                    {isEditing
-                                        ? 'Edit the details below'
-                                        : 'Fill in the details to create a new entry'}
+                                    {isEditing ? 'Edit the details below' : 'Fill in the details to create a new entry'}
                                 </p>
                             </div>
                         </div>
@@ -618,16 +608,15 @@ const CitizensCharter = () => {
                         </button>
                     </div>
 
-                    {/* Form - PINATAAS ANG MGA INPUT */}
+                    {/* Form */}
                     <form className="p-5 sm:p-6 bg-white" onSubmit={handleSubmit}>
-                        {/* Title */}
                         <div className="space-y-5">
+                            {/* Title */}
                             <div className="space-y-1.5">
                                 <label className="text-xs font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
                                     <span className="w-2 h-2 bg-[#0038A8] rounded-full"></span>
                                     Document Title
                                 </label>
-
                                 <input
                                     type="text"
                                     required
@@ -643,13 +632,12 @@ const CitizensCharter = () => {
                                 />
                             </div>
 
-                            {/* Description - DINAGDAGAN ANG HEIGHT */}
+                            {/* Description */}
                             <div className="space-y-1.5">
                                 <label className="text-xs font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
                                     <span className="w-2 h-2 bg-[#0038A8] rounded-full"></span>
                                     Summary / Description
                                 </label>
-
                                 <textarea
                                     rows={4}
                                     value={formData.description}
@@ -664,14 +652,13 @@ const CitizensCharter = () => {
                                 />
                             </div>
 
-                            {/* Links - PINATAAS ANG MGA INPUT */}
+                            {/* Links */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between border-b-2 border-slate-100 pb-3">
                                     <label className="text-xs font-black text-slate-500 uppercase tracking-[0.15em] flex items-center gap-2">
                                         <span className="w-2 h-2 bg-[#0038A8] rounded-full"></span>
                                         Document Links
                                     </label>
-
                                     <button
                                         type="button"
                                         onClick={addLinkField}
@@ -690,43 +677,30 @@ const CitizensCharter = () => {
                                         <div className="flex-1 space-y-4">
                                             <div>
                                                 <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                                                    <span className="text-[#0038A8]">
-                                                        #{index + 1}
-                                                    </span>
+                                                    <span className="text-[#0038A8]">#{index + 1}</span>
                                                     Link Title
                                                 </label>
-
                                                 <input
                                                     type="text"
                                                     required
                                                     value={link.title}
                                                     onChange={(e) =>
-                                                        handleLinkChange(
-                                                            index,
-                                                            'title',
-                                                            e.target.value
-                                                        )
+                                                        handleLinkChange(index, 'title', e.target.value)
                                                     }
                                                     className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-white outline-none transition-all text-sm font-medium focus:border-[#0038A8]"
                                                     placeholder="e.g., View Document"
                                                 />
                                             </div>
-
                                             <div>
                                                 <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                                                     Google Drive URL
                                                 </label>
-
                                                 <input
                                                     type="url"
                                                     required
                                                     value={link.url}
                                                     onChange={(e) =>
-                                                        handleLinkChange(
-                                                            index,
-                                                            'url',
-                                                            e.target.value
-                                                        )
+                                                        handleLinkChange(index, 'url', e.target.value)
                                                     }
                                                     className="w-full px-3 py-2.5 rounded-lg border border-slate-200 bg-white outline-none transition-all text-sm font-medium focus:border-[#0038A8]"
                                                     placeholder="https://drive.google.com/file/d/..."
@@ -737,12 +711,10 @@ const CitizensCharter = () => {
                                         {formData.links.length > 1 && (
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    removeLinkField(index)
-                                                }
+                                                onClick={() => removeLinkField(index)}
                                                 className="mt-1 p-2.5 text-red-500 hover:bg-red-50 rounded-lg transition-all shrink-0 hover:scale-105"
                                             >
-                                                <Trash size={18} />
+                                                <Trash2 size={18} />
                                             </button>
                                         )}
                                     </div>
@@ -750,7 +722,7 @@ const CitizensCharter = () => {
                             </div>
                         </div>
 
-                        {/* Footer - STICKY */}
+                        {/* Footer */}
                         <div className="sticky bottom-0 bg-white pt-6 mt-6 flex gap-3 border-t-2 border-slate-100 pb-1">
                             <button
                                 type="button"
@@ -759,7 +731,6 @@ const CitizensCharter = () => {
                             >
                                 Cancel
                             </button>
-
                             <button
                                 type="submit"
                                 className={`flex-1 px-4 py-3.5 rounded-xl font-bold text-white transition-all uppercase text-xs flex items-center justify-center gap-2 shadow-lg ${
@@ -769,124 +740,10 @@ const CitizensCharter = () => {
                                 }`}
                             >
                                 <Send size={16} />
-                                {isEditing || isNewCard && editingId
-                                    ? 'Save Changes'
-                                    : 'Post Document'}
+                                {isEditing || isNewCard && editingId ? 'Save Changes' : 'Post Document'}
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        );
-    };
-
-    // ===== NEW: Render Flipped Document Card (PDF Viewer) - A4/FULL PAGE VIEW =====
-    const renderFlippedDocumentCard = () => {
-        if (!flippedDocumentCard || !viewingDocument) return null;
-
-        const fileId = viewingDocument.links?.[0]?.fileId;
-        const hasValidFileId = fileId && fileId.trim() !== '';
-
-        return (
-            <div className="col-span-1 md:col-span-2 xl:col-span-3">
-                <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-[#0038A8] overflow-hidden animate-in slide-in-from-bottom duration-300 max-h-[95vh] overflow-y-auto">
-                    {/* Header - STICKY */}
-                    <div className="sticky top-0 z-10 relative p-5 sm:p-6 flex justify-between items-center text-white bg-gradient-to-r from-[#0038A8] to-[#002b80]">
-                        <div className="absolute inset-0 opacity-10 pointer-events-none">
-                            <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/3"></div>
-                            <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full translate-y-1/2 -translate-x-1/4"></div>
-                        </div>
-
-                        <div className="relative z-10 flex items-center gap-3">
-                            <div className="p-2.5 bg-white/20 rounded-2xl backdrop-blur-sm">
-                                <FileText size={24} className="text-[#FCD116]" />
-                            </div>
-
-                            <div>
-                                <h3 className="font-black uppercase tracking-tight text-lg sm:text-xl line-clamp-1">
-                                    {viewingDocument.title || 'Document Viewer'}
-                                </h3>
-                                <p className="text-white/80 text-xs font-medium mt-0.5">
-                                    PDF Document Preview - A4 View
-                                </p>
-                            </div>
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={closeFlippedDocumentCard}
-                            className="relative z-10 hover:bg-white/20 p-2 rounded-full transition-all hover:scale-110"
-                        >
-                            <X size={24} />
-                        </button>
-                    </div>
-
-                    {/* PDF Viewer Body - PROPER A4/FULL PAGE DISPLAY */}
-                    <div className="p-5 sm:p-6 bg-white">
-                        {hasValidFileId ? (
-                            <div className="w-full bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
-                                {/* A4 Aspect Ratio Container (1:√2 ≈ 1:1.414) */}
-                                <div className="relative w-full" style={{ paddingBottom: '141.4%' }}>
-                                    <iframe
-                                        src={`https://drive.google.com/file/d/${fileId}/preview`}
-                                        width="100%"
-                                        height="100%"
-                                        allow="autoplay; fullscreen"
-                                        className="absolute top-0 left-0 w-full h-full"
-                                        title={viewingDocument.title || 'Document Preview'}
-                                        style={{ border: 0 }}
-                                        allowFullScreen
-                                    />
-                                </div>
-                                
-                                {/* Footer with controls */}
-                                <div className="p-3 bg-slate-50 border-t border-slate-200 flex justify-between items-center flex-wrap gap-2">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-xs text-slate-500 font-medium truncate max-w-[200px]">
-                                            📄 {viewingDocument.title || 'Document'}
-                                        </span>
-                                        <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
-                                            A4 Size
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <a
-                                            href={`https://drive.google.com/file/d/${fileId}/view`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-xs text-[#0038A8] hover:text-[#CE1126] font-bold flex items-center gap-1 transition-colors"
-                                        >
-                                            <ExternalLink size={12} /> Open in new tab
-                                        </a>
-                                        <a
-                                            href={`https://drive.google.com/uc?export=download&id=${fileId}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-xs bg-[#0038A8] text-white px-3 py-1.5 rounded-lg hover:bg-[#002b80] transition-colors shadow-sm"
-                                        >
-                                            Download PDF
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="text-center py-12 px-4">
-                                <div className="bg-red-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <FileText size={40} className="text-red-500" />
-                                </div>
-                                <h4 className="font-bold text-slate-700 text-lg mb-2">No Preview Available</h4>
-                                <p className="text-slate-500 text-sm max-w-md mx-auto">
-                                    The document could not be loaded. Please check if the Google Drive link is valid.
-                                </p>
-                                <button
-                                    onClick={closeFlippedDocumentCard}
-                                    className="mt-4 px-6 py-2 bg-[#0038A8] text-white rounded-xl font-medium hover:bg-[#002b80] transition-colors"
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        )}
-                    </div>
                 </div>
             </div>
         );
@@ -948,9 +805,7 @@ const CitizensCharter = () => {
                                 <div className="bg-red-50 w-16 h-16 rounded-full flex items-center justify-center mx-auto">
                                     <Trash2 size={32} className="text-red-600" />
                                 </div>
-                                <p className="text-slate-700">
-                                    Are you sure you want to delete this QMS Corner?
-                                </p>
+                                <p className="text-slate-700">Are you sure you want to delete this QMS Corner?</p>
                                 <div className="bg-slate-50 p-3 rounded-xl">
                                     <p className="font-bold text-[#0038A8]">{handbookToDelete.title}</p>
                                     <p className="text-sm text-slate-500 mt-1 line-clamp-2">{handbookToDelete.description}</p>
@@ -960,9 +815,7 @@ const CitizensCharter = () => {
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-xs text-red-600 font-medium">
-                                    This action cannot be undone.
-                                </p>
+                                <p className="text-xs text-red-600 font-medium">This action cannot be undone.</p>
                             </div>
 
                             <div className="flex gap-3">
@@ -1036,6 +889,24 @@ const CitizensCharter = () => {
                             </form>
 
                             <div className="flex items-center gap-3">
+                                {/* View Mode Toggle */}
+                                <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+                                    <button
+                                        onClick={() => setViewMode('grid')}
+                                        className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-white shadow-md text-[#0038A8]' : 'text-slate-400 hover:text-slate-600'}`}
+                                        title="Grid View"
+                                    >
+                                        <Grid size={18} />
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('list')}
+                                        className={`p-2 rounded-lg transition-all ${viewMode === 'list' ? 'bg-white shadow-md text-[#0038A8]' : 'text-slate-400 hover:text-slate-600'}`}
+                                        title="List View"
+                                    >
+                                        <List size={18} />
+                                    </button>
+                                </div>
+
                                 <span className="text-xs font-medium text-slate-500">Show:</span>
                                 <select
                                     value={limit}
@@ -1074,175 +945,386 @@ const CitizensCharter = () => {
                         </div>
                     ) : (
                         <>
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {/* Render Flip Card Form if any card is flipped */}
-                                {renderFlipCardForm()}
+                            {/* Conditionally render grid or list view */}
+                            {viewMode === 'grid' ? (
+                                // GRID VIEW - with document cards in a grid
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                    {/* Render Flip Card Form if any card is flipped */}
+                                    {renderFlipCardForm()}
 
-                                {/* Render Flipped Document Card if any document is flipped */}
-                                {renderFlippedDocumentCard()}
+                                    {/* Render Flipped Document Card using PDFViewCard component */}
+                                    {flippedDocumentCard && viewingDocument && (
+                                        <PDFViewCard 
+                                            document={viewingDocument} 
+                                            onClose={closeFlippedDocumentCard} 
+                                        />
+                                    )}
 
-                                {/* Render QMS Cards */}
-                                {qmsCorners.map((item) => {
-                                    // Skip rendering this card if it's flipped (editing mode) or if document is being viewed
-                                    if (flippedCardId === item._id || flippedDocumentCard === item._id) return null;
+                                    {/* Render QMS Cards */}
+                                    {qmsCorners.map((item) => {
+                                        if (flippedCardId === item._id || flippedDocumentCard === item._id) return null;
 
-                                    const links = parseLinks(item.subtitle);
-                                    const hasLinks = links && links.length > 0;
-                                    const visibleLinks = hasLinks ? getVisibleDocumentsForCard(item._id, links) : [];
-                                    const visibleCount = hasLinks ? getVisibleCount(item._id, links) : 0;
-                                    const totalLinks = hasLinks ? links.length : 0;
-                                    const allHidden = visibleCount === 0 && totalLinks > 0;
+                                        const links = parseLinks(item.subtitle);
+                                        const hasLinks = links && links.length > 0;
+                                        const visibleLinks = hasLinks ? getVisibleDocumentsForCard(item._id, links) : [];
+                                        const visibleCount = hasLinks ? getVisibleCount(item._id, links) : 0;
+                                        const totalLinks = hasLinks ? links.length : 0;
+                                        const allHidden = visibleCount === 0 && totalLinks > 0;
 
-                                    return (
-                                        <div key={item._id} className="group relative flex flex-col overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1 h-full">
-                                            {item.category && item.category !== "QMS corner" && (
-                                                <div className="mb-3">
-                                                    <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getCategoryColor(item.category)}`}>
-                                                        {item.category}
-                                                    </span>
+                                        return (
+                                            <div key={item._id} className="group relative flex flex-col overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1 h-full">
+                                                {item.category && item.category !== "QMS corner" && (
+                                                    <div className="mb-3">
+                                                        <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getCategoryColor(item.category)}`}>
+                                                            {item.category}
+                                                        </span>
+                                                    </div>
+                                                )}
+
+                                                <h3 className="text-[#0038A8] font-black text-xl leading-tight uppercase tracking-tight group-hover:text-[#002b80] transition-colors line-clamp-2 mb-1">
+                                                    {item.title}
+                                                </h3>
+
+                                                <div className="flex items-start gap-2 mb-3">
+                                                    <File size={16} className="text-[#0038A8] mt-0.5 flex-shrink-0" />
+                                                    <p className="text-slate-600 text-sm leading-relaxed font-medium line-clamp-2">
+                                                        {item.description || "No description available"}
+                                                    </p>
                                                 </div>
-                                            )}
 
-                                            <h3 className="text-[#0038A8] font-black text-xl leading-tight uppercase tracking-tight group-hover:text-[#002b80] transition-colors line-clamp-2 mb-1">
-                                                {item.title}
-                                            </h3>
-
-                                            <div className="flex items-start gap-2 mb-3">
-                                                <File size={16} className="text-[#0038A8] mt-0.5 flex-shrink-0" />
-                                                <p className="text-slate-600 text-sm leading-relaxed font-medium line-clamp-2">
-                                                    {item.description || "No description available"}
-                                                </p>
-                                            </div>
-
-                                            {hasLinks && (
-                                                <div className="mt-auto">
-                                                    <div className="flex items-center justify-between gap-2 text-xs text-slate-500 font-medium mb-2">
-                                                        <div className="flex items-center gap-2">
-                                                            <FileText size={14} className="text-[#0038A8]" />
-                                                            <span>DOCUMENTS:</span>
-                                                            <span className="text-[10px] text-slate-400">
-                                                                ({visibleCount}/{totalLinks} visible)
-                                                            </span>
-                                                        </div>
-                                                        
-                                                        {isAdmin && totalLinks > 0 && (
-                                                            <button
-                                                                onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
-                                                                className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#0038A8] transition-all"
-                                                                title={allHidden ? "Show all documents" : "Hide all documents"}
-                                                            >
-                                                                {allHidden ? <Eye size={14} /> : <EyeOff size={14} />}
-                                                            </button>
-                                                        )}
-                                                    </div>
-                                                    
-                                                    <div className="space-y-1.5">
-                                                        {links.map((link, index) => {
-                                                            const isVisible = isDocumentVisible(item._id, index);
+                                                {hasLinks && (
+                                                    <div className="mt-auto">
+                                                        <div className="flex items-center justify-between gap-2 text-xs text-slate-500 font-medium mb-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <FileText size={14} className="text-[#0038A8]" />
+                                                                <span>DOCUMENTS:</span>
+                                                                <span className="text-[10px] text-slate-400">
+                                                                    ({visibleCount}/{totalLinks} visible)
+                                                                </span>
+                                                            </div>
                                                             
-                                                            if (!isVisible) return null;
-                                                            
-                                                            const docTitle = link.title || `Document ${index + 1}`;
-                                                            
-                                                            return link.fileId ? (
-                                                                <button
-                                                                    key={index}
-                                                                    onClick={() => flipDocumentCard(item, link)}
-                                                                    className="w-full text-left text-sm text-[#0038A8] hover:text-[#CE1126] hover:underline transition-colors font-medium flex items-start group/link gap-2 py-0.5"
-                                                                >
-                                                                    <span className="flex-1 break-words min-w-0 leading-relaxed">
-                                                                        * {docTitle}
-                                                                    </span>
-                                                                    
-                                                                    {isAdmin && (
-                                                                        <button
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                toggleDocumentVisibility(item._id, index);
-                                                                            }}
-                                                                            className="p-0.5 rounded hover:bg-slate-100 text-slate-300 hover:text-amber-600 transition-all opacity-0 group-hover/link:opacity-100 flex-shrink-0 mt-0.5"
-                                                                            title="Hide this document"
-                                                                        >
-                                                                            <EyeOff size={12} />
-                                                                        </button>
-                                                                    )}
-                                                                </button>
-                                                            ) : (
-                                                                <a
-                                                                    key={index}
-                                                                    href={link.url}
-                                                                    target="_blank"
-                                                                    rel="noopener noreferrer"
-                                                                    className="block text-sm text-[#0038A8] hover:text-[#CE1126] hover:underline transition-colors font-medium flex items-start group/link gap-2 py-0.5"
-                                                                >
-                                                                    <span className="flex-1 break-words min-w-0 leading-relaxed">
-                                                                        * {docTitle}
-                                                                    </span>
-                                                                    
-                                                                    {isAdmin && (
-                                                                        <button
-                                                                            onClick={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                                toggleDocumentVisibility(item._id, index);
-                                                                            }}
-                                                                            className="p-0.5 rounded hover:bg-slate-100 text-slate-300 hover:text-amber-600 transition-all opacity-0 group-hover/link:opacity-100 flex-shrink-0 mt-0.5"
-                                                                            title="Hide this document"
-                                                                        >
-                                                                            <EyeOff size={12} />
-                                                                        </button>
-                                                                    )}
-                                                                </a>
-                                                            );
-                                                        })}
-                                                    </div>
-
-                                                    {visibleCount === 0 && (
-                                                        <div className="text-sm text-slate-400 italic flex items-center gap-2 py-1">
-                                                            <EyeOff size={14} />
-                                                            <span>All documents are hidden</span>
-                                                            {isAdmin && (
+                                                            {isAdmin && totalLinks > 0 && (
                                                                 <button
                                                                     onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
-                                                                    className="text-xs text-[#0038A8] hover:underline font-medium"
+                                                                    className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#0038A8] transition-all"
+                                                                    title={allHidden ? "Show all documents" : "Hide all documents"}
                                                                 >
-                                                                    Show all
+                                                                    {allHidden ? <Eye size={14} /> : <EyeOff size={14} />}
                                                                 </button>
                                                             )}
                                                         </div>
-                                                    )}
-                                                </div>
-                                            )}
+                                                        
+                                                        {/* Document Grid with PDFIcon - 3 columns */}
+                                                        <div className="grid grid-cols-3 gap-2">
+                                                            {links.map((link, index) => {
+                                                                const isVisible = isDocumentVisible(item._id, index);
+                                                                
+                                                                if (!isVisible) return null;
+                                                                
+                                                                const docTitle = link.title || `Document ${index + 1}`;
+                                                                
+                                                                return link.fileId ? (
+                                                                    <button
+                                                                        key={index}
+                                                                        onClick={() => flipDocumentCard(item, link)}
+                                                                        className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-center group/link border border-blue-200 hover:border-[#0038A8] flex flex-col items-center gap-1.5"
+                                                                    >
+                                                                        <img 
+                                                                            src={PDFIcon} 
+                                                                            alt="PDF" 
+                                                                            className="w-8 h-8 object-contain"
+                                                                        />
+                                                                        <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
+                                                                            {docTitle}
+                                                                        </span>
+                                                                        
+                                                                        {isAdmin && (
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    toggleDocumentVisibility(item._id, index);
+                                                                                }}
+                                                                                className="mt-1 p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-amber-600 transition-all opacity-0 group-hover/link:opacity-100"
+                                                                                title="Hide this document"
+                                                                            >
+                                                                                <EyeOff size={12} />
+                                                                            </button>
+                                                                        )}
+                                                                    </button>
+                                                                ) : (
+                                                                    <a
+                                                                        key={index}
+                                                                        href={link.url}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-center group/link border border-blue-200 hover:border-[#0038A8] flex flex-col items-center gap-1.5"
+                                                                    >
+                                                                        <ExternalLink size={20} className="text-[#0038A8] group-hover/link:text-[#CE1126]" />
+                                                                        <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
+                                                                            {docTitle}
+                                                                        </span>
+                                                                        
+                                                                        {isAdmin && (
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.preventDefault();
+                                                                                    e.stopPropagation();
+                                                                                    toggleDocumentVisibility(item._id, index);
+                                                                                }}
+                                                                                className="mt-1 p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-amber-600 transition-all opacity-0 group-hover/link:opacity-100"
+                                                                                title="Hide this document"
+                                                                            >
+                                                                                <EyeOff size={12} />
+                                                                            </button>
+                                                                        )}
+                                                                    </a>
+                                                                );
+                                                            })}
+                                                        </div>
 
-                                            <div className={`${hasLinks ? 'mt-4' : 'mt-auto pt-3'} border-t border-slate-100 flex items-center justify-between`}>
-                                                <div className="flex items-center gap-2 text-xs text-slate-400">
-                                                    <Calendar size={12} />
-                                                    <span>Added: {formatDate(item.createdAt)}</span>
-                                                </div>
-
-                                                {isAdmin && (
-                                                    <div className="flex gap-1">
-                                                        <button
-                                                            onClick={() => openCardForEdit(item)}
-                                                            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#0038A8] transition-all"
-                                                            title="Edit this QMS Corner"
-                                                        >
-                                                            <Pencil size={14} />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => openDeleteConfirm(item)}
-                                                            className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-red-600 transition-all"
-                                                            title="Delete this QMS Corner"
-                                                        >
-                                                            <Trash2 size={14} />
-                                                        </button>
+                                                        {visibleCount === 0 && (
+                                                            <div className="text-sm text-slate-400 italic flex items-center gap-2 py-2 justify-center">
+                                                                <EyeOff size={14} />
+                                                                <span>All documents are hidden</span>
+                                                                {isAdmin && (
+                                                                    <button
+                                                                        onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
+                                                                        className="text-xs text-[#0038A8] hover:underline font-medium"
+                                                                    >
+                                                                        Show all
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
+
+                                                <div className={`${hasLinks ? 'mt-4' : 'mt-auto pt-3'} border-t border-slate-100 flex items-center justify-between`}>
+                                                    <div className="flex items-center gap-2 text-xs text-slate-400">
+                                                        <Calendar size={12} />
+                                                        <span>Added: {formatDate(item.createdAt)}</span>
+                                                    </div>
+
+                                                    {isAdmin && (
+                                                        <div className="flex gap-1">
+                                                            <button
+                                                                onClick={() => openCardForEdit(item)}
+                                                                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#0038A8] transition-all"
+                                                                title="Edit this QMS Corner"
+                                                            >
+                                                                <Pencil size={14} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => openDeleteConfirm(item)}
+                                                                className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-red-600 transition-all"
+                                                                title="Delete this QMS Corner"
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                // LIST VIEW - LEFT AND RIGHT LAYOUT with 3 Grid
+                                <div className="space-y-4">
+                                    {/* Render Flip Card Form if any card is flipped */}
+                                    {renderFlipCardForm()}
+
+                                    {/* Render Flipped Document Card using PDFViewCard component */}
+                                    {flippedDocumentCard && viewingDocument && (
+                                        <PDFViewCard 
+                                            document={viewingDocument} 
+                                            onClose={closeFlippedDocumentCard} 
+                                        />
+                                    )}
+
+                                    {/* Render QMS Cards in List View with Left/Right Layout */}
+                                    {qmsCorners.map((item) => {
+                                        if (flippedCardId === item._id || flippedDocumentCard === item._id) return null;
+
+                                        const links = parseLinks(item.subtitle);
+                                        const hasLinks = links && links.length > 0;
+                                        const visibleLinks = hasLinks ? getVisibleDocumentsForCard(item._id, links) : [];
+                                        const visibleCount = hasLinks ? getVisibleCount(item._id, links) : 0;
+                                        const totalLinks = hasLinks ? links.length : 0;
+                                        const allHidden = visibleCount === 0 && totalLinks > 0;
+
+                                        return (
+                                            <div key={item._id} className="group relative flex flex-row overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1">
+                                                {/* LEFT SIDE - Category and Documents */}
+                                                <div className="flex-1 min-w-0 pr-6 border-r border-slate-200">
+                                                    {item.category && item.category !== "QMS corner" && (
+                                                        <div className="mb-3">
+                                                            <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getCategoryColor(item.category)}`}>
+                                                                {item.category}
+                                                            </span>
+                                                        </div>
+                                                    )}
+
+                                                    {hasLinks && (
+                                                        <div>
+                                                            <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-3">
+                                                                <FileText size={14} className="text-[#0038A8]" />
+                                                                <span>DOCUMENTS:</span>
+                                                                <span className="text-[10px] text-slate-400">
+                                                                    ({visibleCount}/{totalLinks} visible)
+                                                                </span>
+                                                                
+                                                                {isAdmin && totalLinks > 0 && (
+                                                                    <button
+                                                                        onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
+                                                                        className="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-[#0038A8] transition-all ml-auto"
+                                                                        title={allHidden ? "Show all documents" : "Hide all documents"}
+                                                                    >
+                                                                        {allHidden ? <Eye size={14} /> : <EyeOff size={14} />}
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                            
+                                                            {/* Document Grid - 3 columns only */}
+                                                            <div className="grid grid-cols-3 gap-2">
+                                                                {links.map((link, index) => {
+                                                                    const isVisible = isDocumentVisible(item._id, index);
+                                                                    
+                                                                    if (!isVisible) return null;
+                                                                    
+                                                                    const docTitle = link.title || `Document ${index + 1}`;
+                                                                    
+                                                                    return link.fileId ? (
+                                                                        <button
+                                                                            key={index}
+                                                                            onClick={() => flipDocumentCard(item, link)}
+                                                                            className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-center group/link border border-blue-200 hover:border-[#0038A8] flex flex-col items-center gap-1.5"
+                                                                        >
+                                                                            <img 
+                                                                                src={PDFIcon} 
+                                                                                alt="PDF" 
+                                                                                className="w-8 h-8 object-contain"
+                                                                            />
+                                                                            <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
+                                                                                {docTitle}
+                                                                            </span>
+                                                                            
+                                                                            {isAdmin && (
+                                                                                <button
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        toggleDocumentVisibility(item._id, index);
+                                                                                    }}
+                                                                                    className="mt-1 p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-amber-600 transition-all opacity-0 group-hover/link:opacity-100"
+                                                                                    title="Hide this document"
+                                                                                >
+                                                                                    <EyeOff size={12} />
+                                                                                </button>
+                                                                            )}
+                                                                        </button>
+                                                                    ) : (
+                                                                        <a
+                                                                            key={index}
+                                                                            href={link.url}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-center group/link border border-blue-200 hover:border-[#0038A8] flex flex-col items-center gap-1.5"
+                                                                        >
+                                                                            <ExternalLink size={20} className="text-[#0038A8] group-hover/link:text-[#CE1126]" />
+                                                                            <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
+                                                                                {docTitle}
+                                                                            </span>
+                                                                            
+                                                                            {isAdmin && (
+                                                                                <button
+                                                                                    onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        e.stopPropagation();
+                                                                                        toggleDocumentVisibility(item._id, index);
+                                                                                    }}
+                                                                                    className="mt-1 p-1 rounded hover:bg-slate-200 text-slate-400 hover:text-amber-600 transition-all opacity-0 group-hover/link:opacity-100"
+                                                                                    title="Hide this document"
+                                                                                >
+                                                                                    <EyeOff size={12} />
+                                                                                </button>
+                                                                            )}
+                                                                        </a>
+                                                                    );
+                                                                })}
+                                                            </div>
+
+                                                            {visibleCount === 0 && (
+                                                                <div className="text-sm text-slate-400 italic flex items-center gap-2 py-2 justify-center">
+                                                                    <EyeOff size={14} />
+                                                                    <span>All documents are hidden</span>
+                                                                    {isAdmin && (
+                                                                        <button
+                                                                            onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
+                                                                            className="text-xs text-[#0038A8] hover:underline font-medium"
+                                                                        >
+                                                                            Show all
+                                                                        </button>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {!hasLinks && (
+                                                        <div className="text-sm text-slate-400 italic py-4">
+                                                            No documents available
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                {/* RIGHT SIDE - Title, Description, Edit/Delete */}
+                                                <div className="w-[45%] lg:w-[40%] pl-6 flex flex-col justify-between">
+                                                    <div>
+                                                        <h3 className="text-[#0038A8] font-black text-xl leading-tight uppercase tracking-tight group-hover:text-[#002b80] transition-colors mb-2">
+                                                            {item.title}
+                                                        </h3>
+
+                                                        <div className="flex items-start gap-2">
+                                                            <File size={16} className="text-[#0038A8] mt-0.5 flex-shrink-0" />
+                                                            <p className="text-slate-600 text-sm leading-relaxed font-medium line-clamp-3">
+                                                                {item.description || "No description available"}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+                                                        <div className="flex items-center gap-2 text-xs text-slate-400">
+                                                            <Calendar size={12} />
+                                                            <span>Added: {formatDate(item.createdAt)}</span>
+                                                        </div>
+
+                                                        {isAdmin && (
+                                                            <div className="flex gap-2">
+                                                                <button
+                                                                    onClick={() => openCardForEdit(item)}
+                                                                    className="px-3 py-1.5 rounded-lg bg-[#0038A8] text-white text-xs font-bold hover:bg-[#002b80] transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md"
+                                                                    title="Edit this QMS Corner"
+                                                                >
+                                                                    <Pencil size={12} />
+                                                                    Edit
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => openDeleteConfirm(item)}
+                                                                    className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-xs font-bold hover:bg-red-600 transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md"
+                                                                    title="Delete this QMS Corner"
+                                                                >
+                                                                    <Trash2 size={12} />
+                                                                    Delete
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
 
                             {/* PAGINATION CONTROLS */}
                             {backendTotalPages > 1 && (
