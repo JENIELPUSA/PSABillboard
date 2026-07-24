@@ -9,7 +9,7 @@ export const navbarLinks = [
                 path: "/dashboard",
             },
             {
-                label: "Citizen Character",
+                label: "Citizen Charter",
                 icon: Users,
                 path: "/dashboard/citizencharacter",
             },

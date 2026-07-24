@@ -8,6 +8,24 @@ const QMScornerSchema = new mongoose.Schema(
       trim: true,
     },
 
+    description: {
+      type: String,
+      required: false, // Optional field
+      trim: true,
+      default: "",
+    },
+
+    category: {
+      type: String,
+      required: [true, "Category is required"],
+      trim: true,
+      enum: {
+        values: ["Citizen Character", "5S", "QMS corner", "GAD Corner"],
+        message: "Category must be one of: Citizen Character, 5S, QMS corner, GAD Corner"
+      },
+      default: "QMS corner"
+    },
+
     subtitle: [
       {
         subtitle: {
@@ -27,6 +45,5 @@ const QMScornerSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
 
 module.exports = mongoose.model("QmsCorner", QMScornerSchema);
