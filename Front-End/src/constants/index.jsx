@@ -1,4 +1,16 @@
-import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, UserCheck, UserPlus, Users} from "lucide-react";
+import {
+    FolderArchive,
+    Home,
+    NotepadText,
+    Package,
+    PackagePlus,
+    Settings,
+    ShoppingBag,
+    UserCheck,
+    UserPlus,
+    Users
+} from "lucide-react";
+
 export const navbarLinks = [
     {
         title: "Dashboard",
@@ -10,26 +22,24 @@ export const navbarLinks = [
             },
             {
                 label: "Citizen's Charter",
-                icon: Users,
+                icon: FolderArchive,
                 path: "/dashboard/citizencharacter",
             },
             {
                 label: "5S Corner",
-                icon: ChartColumn,
+                icon: FolderArchive,
                 path: "/dashboard/corners",
             },
             {
                 label: "QMS Corner",
-                icon: ChartColumn,
+                icon: FolderArchive,
                 path: "/dashboard/qmscorner",
             },
             {
                 label: "GAD Corner",
-                icon: ChartColumn,
+                icon: FolderArchive,
                 path: "/dashboard/gadcorner",
             }
-
         ],
     }
 ];
-
