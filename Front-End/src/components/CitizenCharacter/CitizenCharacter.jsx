@@ -41,10 +41,10 @@ import asset4 from "../../assets/assets4.jpeg";
 // ============================================================
 // FLOATING AVATAR SA RIGHT SIDE - ORIGINAL STYLE WITH TIMER LOOP
 // ============================================================
-const FloatingAvatar = ({ 
-    userName = "Citizen's Charter Guide", 
-    userRole = "Public Assistance & Information", 
-    userStatus = "online", 
+const FloatingAvatar = ({
+    userName = "Citizen's Charter Guide",
+    userRole = "Public Assistance & Information",
+    userStatus = "online",
     introTexts = [
         "Hi! Welcome to Our Citizen's Charter! 👋",
         "Explore our services and documents! 📋",
@@ -106,11 +106,11 @@ const FloatingAvatar = ({
         // Random expression
         const expressions = ['happy', 'excited', 'cool', 'thinking'];
         setExpression(expressions[Math.floor(Math.random() * expressions.length)]);
-        
+
         // Random text
         const randomIndex = Math.floor(Math.random() * introTexts.length);
         setCurrentTextIndex(randomIndex);
-        
+
         setIsPeekingOut(true);
         setIsWaving(true);
         playPopSound(580 + Math.random() * 100, 0.2);
@@ -170,27 +170,12 @@ const FloatingAvatar = ({
 
     return (
         <div className="fixed right-6 bottom-8 z-[100] flex flex-col items-end">
-            {/* Timer Indicator */}
-            <div className="mb-2 flex items-center gap-2 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md border border-slate-200">
-                <Clock size={14} className="text-[#0038A8] animate-pulse" />
-                <span className="text-xs font-bold text-[#0038A8]">
-                    Next peek in: <span className="text-amber-600">{countdown}s</span>
-                </span>
-                <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                    <div 
-                        className="h-full bg-gradient-to-r from-[#0038A8] to-amber-400 rounded-full transition-all duration-1000"
-                        style={{ width: `${(countdown / 8) * 100}%` }}
-                    />
-                </div>
-            </div>
-
             {/* ORIGINAL AVATAR STYLE - With Barrier Wall / Desk */}
             <div className="relative flex flex-col items-center">
                 {/* Dynamic Speech Bubble */}
-                <div 
-                    className={`absolute -top-24 right-1/2 translate-x-1/2 bg-white text-slate-900 font-black text-xs sm:text-sm px-5 py-3 rounded-2xl border-3 border-slate-900 shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] transition-all duration-500 z-40 w-72 text-center leading-snug ${
-                        isPeekingOut ? 'opacity-100 scale-100 -translate-y-2' : 'opacity-0 scale-50 translate-y-6 pointer-events-none'
-                    }`}
+                <div
+                    className={`absolute -top-24 right-1/2 translate-x-1/2 bg-white text-slate-900 font-black text-xs sm:text-sm px-5 py-3 rounded-2xl border-3 border-slate-900 shadow-[5px_5px_0px_0px_rgba(15,23,42,1)] transition-all duration-500 z-40 w-72 text-center leading-snug ${isPeekingOut ? 'opacity-100 scale-100 -translate-y-2' : 'opacity-0 scale-50 translate-y-6 pointer-events-none'
+                        }`}
                 >
                     <div className="text-[10px] uppercase font-black tracking-widest text-amber-600 mb-0.5 flex items-center justify-center gap-2">
                         <span>🏛️ CITIZEN'S CHARTER</span>
@@ -205,21 +190,20 @@ const FloatingAvatar = ({
                 </div>
 
                 {/* Peeking Avatar Container with Barrier Wall */}
-                <div 
+                <div
                     className="relative w-80 h-48 flex items-end justify-center cursor-pointer group"
                     onClick={triggerPeekAndWave}
                 >
                     {/* Peeking Character (Nagtatago sa likod ng pader / sumisilip) */}
-                    <div 
-                        className={`absolute bottom-10 transition-all duration-500 ease-out z-10 flex flex-col items-center ${
-                            isPeekingOut 
-                                ? '-translate-y-12 rotate-0' 
+                    <div
+                        className={`absolute bottom-10 transition-all duration-500 ease-out z-10 flex flex-col items-center ${isPeekingOut
+                                ? '-translate-y-12 rotate-0'
                                 : 'translate-y-10 rotate-12 group-hover:translate-y-4 group-hover:rotate-6'
-                        }`}
+                            }`}
                     >
                         {/* 3D Circular Avatar Head */}
                         <div className={`w-32 h-32 ${characterColor} rounded-full border-4 border-slate-900 shadow-[4px_4px_0px_0px_rgba(15,23,42,1)] relative flex flex-col items-center justify-center overflow-visible`}>
-                            
+
                             {/* Eyes */}
                             <div className="flex gap-2.5 mb-1 z-10">
                                 <div className="w-7 h-9 bg-white rounded-full border-3 border-slate-900 relative flex items-center justify-center overflow-hidden">
@@ -254,29 +238,27 @@ const FloatingAvatar = ({
                             </div>
 
                             {/* Mouth */}
-                            <div 
-                                className={`transition-all duration-300 border-slate-900 ${
-                                    !isPeekingOut
+                            <div
+                                className={`transition-all duration-300 border-slate-900 ${!isPeekingOut
                                         ? 'w-4 h-2 border-b-3 rounded-b-full bg-slate-900'
-                                        : isWaving 
-                                        ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-xl relative overflow-hidden' 
-                                        : expression === 'excited'
-                                        ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-full'
-                                        : 'w-5 h-2.5 border-b-3 rounded-b-full'
-                                }`}
+                                        : isWaving
+                                            ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-xl relative overflow-hidden'
+                                            : expression === 'excited'
+                                                ? 'w-6 h-4 bg-rose-500 border-3 rounded-b-full'
+                                                : 'w-5 h-2.5 border-b-3 rounded-b-full'
+                                    }`}
                             />
 
                             {/* Waving Hand Pop-out */}
-                            <div 
-                                className={`absolute -left-3 top-8 w-9 h-9 ${characterColor} border-3 border-slate-900 rounded-full shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] origin-bottom-right transition-all z-20 ${
-                                    isWaving ? 'animate-wave-right' : 'group-hover:-rotate-12'
-                                }`}
+                            <div
+                                className={`absolute -left-3 top-8 w-9 h-9 ${characterColor} border-3 border-slate-900 rounded-full shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] origin-bottom-right transition-all z-20 ${isWaving ? 'animate-wave-right' : 'group-hover:-rotate-12'
+                                    }`}
                             >
                                 <div className={`w-2.5 h-2.5 ${characterColor} border-2 border-slate-900 rounded-full absolute -top-1 right-0.5`} />
                             </div>
 
                             {/* Status Dot Badge */}
-                            <div 
+                            <div
                                 className={`absolute bottom-0 left-1 w-6 h-6 ${statusColors[userStatus]} border-3 rounded-full shadow-[2px_2px_0px_0px_rgba(15,23,42,1)] z-30`}
                                 title={`Status: ${userStatus}`}
                             />
@@ -692,7 +674,7 @@ const CitizensCharter = () => {
     const toggleAllDocumentsInCard = (cardId, linkCount) => {
         const newHiddenSet = new Set(hiddenDocuments);
         let allHidden = true;
-        
+
         for (let i = 0; i < linkCount; i++) {
             const key = getDocumentKey(cardId, i);
             if (!newHiddenSet.has(key)) {
@@ -700,7 +682,7 @@ const CitizensCharter = () => {
                 break;
             }
         }
-        
+
         if (allHidden) {
             for (let i = 0; i < linkCount; i++) {
                 const key = getDocumentKey(cardId, i);
@@ -881,11 +863,10 @@ const CitizensCharter = () => {
                 <div className="relative bg-white rounded-2xl shadow-2xl border-2 border-[#0038A8] overflow-hidden animate-in slide-in-from-bottom duration-300 max-h-[95vh] overflow-y-auto">
                     {/* Header */}
                     <div
-                        className={`sticky top-0 z-10 relative p-5 sm:p-6 flex justify-between items-center text-white ${
-                            isEditing || isNewCard && editingId
+                        className={`sticky top-0 z-10 relative p-5 sm:p-6 flex justify-between items-center text-white ${isEditing || isNewCard && editingId
                                 ? 'bg-gradient-to-r from-amber-600 to-amber-700'
                                 : 'bg-gradient-to-r from-[#0038A8] to-[#002b80]'
-                        }`}
+                            }`}
                     >
                         <div className="absolute inset-0 opacity-10 pointer-events-none">
                             <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -translate-y-1/2 translate-x-1/3"></div>
@@ -1040,11 +1021,10 @@ const CitizensCharter = () => {
                             </button>
                             <button
                                 type="submit"
-                                className={`flex-1 px-4 py-3.5 rounded-xl font-bold text-white transition-all uppercase text-xs flex items-center justify-center gap-2 shadow-lg ${
-                                    isEditing || isNewCard && editingId
+                                className={`flex-1 px-4 py-3.5 rounded-xl font-bold text-white transition-all uppercase text-xs flex items-center justify-center gap-2 shadow-lg ${isEditing || isNewCard && editingId
                                         ? 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700'
                                         : 'bg-gradient-to-r from-[#0038A8] to-[#002b80] hover:from-[#CE1126]'
-                                }`}
+                                    }`}
                             >
                                 <Send size={16} />
                                 {isEditing || isNewCard && editingId ? 'Save Changes' : 'Post Document'}
@@ -1070,7 +1050,7 @@ const CitizensCharter = () => {
     return (
         <div className="relative min-h-screen bg-[#f8fafc] font-sans pb-20 overflow-x-hidden">
             {/* --- FLOATING AVATAR - Right Side with Timer Loop (Original Style) --- */}
-            <FloatingAvatar 
+            <FloatingAvatar
                 userName="Citizen's Charter Guide"
                 userRole="Public Assistance & Information"
                 userStatus="online"
@@ -1277,9 +1257,9 @@ const CitizensCharter = () => {
 
                                     {/* Render Flipped Document Card using PDFViewCard component */}
                                     {flippedDocumentCard && viewingDocument && (
-                                        <PDFViewCard 
-                                            document={viewingDocument} 
-                                            onClose={closeFlippedDocumentCard} 
+                                        <PDFViewCard
+                                            document={viewingDocument}
+                                            onClose={closeFlippedDocumentCard}
                                         />
                                     )}
 
@@ -1325,7 +1305,7 @@ const CitizensCharter = () => {
                                                                     ({visibleCount}/{totalLinks} visible)
                                                                 </span>
                                                             </div>
-                                                            
+
                                                             {isAdmin && totalLinks > 0 && (
                                                                 <button
                                                                     onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
@@ -1336,31 +1316,31 @@ const CitizensCharter = () => {
                                                                 </button>
                                                             )}
                                                         </div>
-                                                        
+
                                                         {/* Document Grid with PDFIcon - 3 columns */}
                                                         <div className="grid grid-cols-3 gap-2">
                                                             {links.map((link, index) => {
                                                                 const isVisible = isDocumentVisible(item._id, index);
-                                                                
+
                                                                 if (!isVisible) return null;
-                                                                
+
                                                                 const docTitle = link.title || `Document ${index + 1}`;
-                                                                
+
                                                                 return link.fileId ? (
                                                                     <button
                                                                         key={index}
                                                                         onClick={() => flipDocumentCard(item, link)}
                                                                         className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-center group/link border border-blue-200 hover:border-[#0038A8] flex flex-col items-center gap-1.5"
                                                                     >
-                                                                        <img 
-                                                                            src={PDFIcon} 
-                                                                            alt="PDF" 
+                                                                        <img
+                                                                            src={PDFIcon}
+                                                                            alt="PDF"
                                                                             className="w-8 h-8 object-contain"
                                                                         />
                                                                         <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
                                                                             {docTitle}
                                                                         </span>
-                                                                        
+
                                                                         {isAdmin && (
                                                                             <button
                                                                                 onClick={(e) => {
@@ -1386,7 +1366,7 @@ const CitizensCharter = () => {
                                                                         <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
                                                                             {docTitle}
                                                                         </span>
-                                                                        
+
                                                                         {isAdmin && (
                                                                             <button
                                                                                 onClick={(e) => {
@@ -1459,9 +1439,9 @@ const CitizensCharter = () => {
 
                                     {/* Render Flipped Document Card using PDFViewCard component */}
                                     {flippedDocumentCard && viewingDocument && (
-                                        <PDFViewCard 
-                                            document={viewingDocument} 
-                                            onClose={closeFlippedDocumentCard} 
+                                        <PDFViewCard
+                                            document={viewingDocument}
+                                            onClose={closeFlippedDocumentCard}
                                         />
                                     )}
 
@@ -1480,23 +1460,16 @@ const CitizensCharter = () => {
                                             <div key={item._id} className="group relative flex flex-row overflow-hidden bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl transition-all hover:-translate-y-1">
                                                 {/* LEFT SIDE - Category and Documents */}
                                                 <div className="flex-1 min-w-0 pr-6 border-r border-slate-200">
-                                                    {item.category && item.category !== "QMS corner" && (
-                                                        <div className="mb-3">
-                                                            <span className={`inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getCategoryColor(item.category)}`}>
-                                                                {item.category}
-                                                            </span>
-                                                        </div>
-                                                    )}
-
                                                     {hasLinks && (
                                                         <div>
+                                                            {/* Header section with status & admin toggle */}
                                                             <div className="flex items-center gap-2 text-xs text-slate-500 font-medium mb-3">
                                                                 <FileText size={14} className="text-[#0038A8]" />
                                                                 <span>DOCUMENTS:</span>
                                                                 <span className="text-[10px] text-slate-400">
                                                                     ({visibleCount}/{totalLinks} visible)
                                                                 </span>
-                                                                
+
                                                                 {isAdmin && totalLinks > 0 && (
                                                                     <button
                                                                         onClick={() => toggleAllDocumentsInCard(item._id, totalLinks)}
@@ -1507,31 +1480,33 @@ const CitizensCharter = () => {
                                                                     </button>
                                                                 )}
                                                             </div>
-                                                            
+
                                                             {/* Document Grid - 3 columns */}
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 {links.map((link, index) => {
                                                                     const isVisible = isDocumentVisible(item._id, index);
-                                                                    
+
                                                                     if (!isVisible) return null;
-                                                                    
+
                                                                     const docTitle = link.title || `Document ${index + 1}`;
-                                                                    
+
                                                                     return link.fileId ? (
+                                                                        /* PDF File Button */
                                                                         <button
                                                                             key={index}
                                                                             onClick={() => flipDocumentCard(item, link)}
                                                                             className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-center group/link border border-blue-200 hover:border-[#0038A8] flex flex-col items-center gap-1.5"
                                                                         >
-                                                                            <img 
-                                                                                src={PDFIcon} 
-                                                                                alt="PDF" 
-                                                                                className="w-8 h-8 object-contain"
+                                                                            <img
+                                                                                src={PDFIcon}
+                                                                                alt="PDF"
+                                                                                className="w-24 h-20 object-contain"
                                                                             />
-                                                                            <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
+                                                                            {/* Walang line-clamp - Ipapakita ang buong pamagat */}
+                                                                            <span className="text-[12px] font-medium text-slate-700 break-words w-full leading-tight">
                                                                                 {docTitle}
                                                                             </span>
-                                                                            
+
                                                                             {isAdmin && (
                                                                                 <button
                                                                                     onClick={(e) => {
@@ -1546,6 +1521,7 @@ const CitizensCharter = () => {
                                                                             )}
                                                                         </button>
                                                                     ) : (
+                                                                        /* External URL Link */
                                                                         <a
                                                                             key={index}
                                                                             href={link.url}
@@ -1554,10 +1530,11 @@ const CitizensCharter = () => {
                                                                             className="p-3 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all text-center group/link border border-blue-200 hover:border-[#0038A8] flex flex-col items-center gap-1.5"
                                                                         >
                                                                             <ExternalLink size={20} className="text-[#0038A8] group-hover/link:text-[#CE1126]" />
-                                                                            <span className="text-[10px] font-medium text-slate-700 line-clamp-2 leading-tight">
+                                                                            {/* Walang line-clamp - Ipapakita ang buong pamagat */}
+                                                                            <span className="text-[10px] font-medium text-slate-700 break-words w-full leading-tight">
                                                                                 {docTitle}
                                                                             </span>
-                                                                            
+
                                                                             {isAdmin && (
                                                                                 <button
                                                                                     onClick={(e) => {
@@ -1576,6 +1553,7 @@ const CitizensCharter = () => {
                                                                 })}
                                                             </div>
 
+                                                            {/* Kapag nakatago ang lahat ng documents */}
                                                             {visibleCount === 0 && (
                                                                 <div className="text-sm text-slate-400 italic flex items-center gap-2 py-2 justify-center">
                                                                     <EyeOff size={14} />
@@ -1593,6 +1571,7 @@ const CitizensCharter = () => {
                                                         </div>
                                                     )}
 
+                                                    {/* Kapag walang kahit anong documents */}
                                                     {!hasLinks && (
                                                         <div className="text-sm text-slate-400 italic py-4">
                                                             No documents available
