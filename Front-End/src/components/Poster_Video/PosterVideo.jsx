@@ -50,13 +50,13 @@ const convertGoogleDriveImage = (url) => {
 // ==========================================
 // CONFIG
 // ==========================================
-const FIRST_DELAY_MS = 3000;   // 3 seconds bago unang labas
-const VIDEO_BUFFER_MS = 2000;  // +2s buffer sa video duration
-const MIN_PLAY_TIME_MS = 5000; // Huwag pansinin ang "ended" kung < 5s pa
-const DEFAULT_REOPEN_MIN = 1;  // Default countdown kung walang reopenAfterMin
+const FIRST_DELAY_MS = 3000;
+const VIDEO_BUFFER_MS = 2000;
+const MIN_PLAY_TIME_MS = 5000;
+const DEFAULT_REOPEN_MIN = 1;
 
 // ==========================================
-// MOCK MEDIA DATA — VIDEO ANG HULI
+// MOCK MEDIA DATA
 // ==========================================
 const initialMediaItems = [
     {
@@ -72,7 +72,7 @@ const initialMediaItems = [
         video: { showTime: "09:00", exitTime: "18:00", timeToShow: 30 },
         reopenAfterMin: 1,
         isActive: true,
-        order: 1, // 👈 1st
+        order: 1,
         description:
             "Ang paglaban sa red tape ay tumutukoy sa pagsisikap na bawasan ang hindi kinakailangang proseso, dokumento, pirma, at matagal na paghihintay upang maging mas mabilis, simple, malinaw, at episyente ang paghahatid ng serbisyo publiko.",
     },
@@ -103,12 +103,11 @@ const initialMediaItems = [
             "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop",
         showDate: "2026-10-03T00:00:00.000Z",
         poster: { timeToShow: 5 },
-        video: { showTime: "08:00", exitTime: "17:00", timeToShow: 177 }, // 2:57
+        video: { showTime: "08:00", exitTime: "17:00", timeToShow: 177 },
         reopenAfterMin: 1,
         isActive: true,
         order: 3,
-        description:
-            "",
+        description: "",
     },
 ];
 
@@ -126,7 +125,7 @@ export default function VideoPosterAds() {
     const iframeRef = useRef(null);
 
     // ==========================================
-    // CLOSE AD — dynamic countdown base sa reopenAfterMin
+    // CLOSE AD
     // ==========================================
     const closeAd = useCallback(() => {
         const reopenMin = currentItem?.reopenAfterMin ?? DEFAULT_REOPEN_MIN;
@@ -143,14 +142,14 @@ export default function VideoPosterAds() {
     }, [currentItem]);
 
     // ==========================================
-    // POPUP SCHEDULER (recursive timeout)
+    // POPUP SCHEDULER
     // ==========================================
     useEffect(() => {
         let timer;
 
         const scheduleNext = (delay) => {
             clearTimeout(timer);
-            console.log(`⏰ Next popup in ${delay / 1000}s (${delay / 60000} min)`);
+            console.log(`⏰ Next popup in ${delay / 1000}s`);
             timer = setTimeout(() => {
                 console.log("🚀 Popup opening now");
                 setIsOpen(true);
@@ -203,7 +202,7 @@ export default function VideoPosterAds() {
         const closeAfterMs = videoDurationSec * 1000 + VIDEO_BUFFER_MS;
 
         console.log(
-            `🎬 Video "${currentItem.title}" → closing in ${closeAfterMs / 1000}s (video.timeToShow: ${videoDurationSec}s)`
+            `🎬 Video "${currentItem.title}" → closing in ${closeAfterMs / 1000}s`
         );
 
         const playStartTime = Date.now();
@@ -303,14 +302,17 @@ export default function VideoPosterAds() {
         .ads-image { animation: adFade 0.4s ease-in; }
       `}</style>
 
+            {/* Backdrop */}
             <div
                 className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm"
                 onClick={closeAd}
             />
 
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
-                <div className="pointer-events-auto w-full max-w-4xl ads-popup">
+            {/* Modal Container */}
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 pointer-events-none">
+                <div className="pointer-events-auto w-full max-w-md sm:max-w-lg ads-popup">
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_70px_rgba(0,0,0,0.6)] border border-slate-200">
+                        {/* Top Bar */}
                         <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent">
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-white/20 px-2.5 py-1 rounded">
@@ -333,7 +335,23 @@ export default function VideoPosterAds() {
                             </button>
                         </div>
 
-                        <div className="relative w-full aspect-video bg-black">
+                        {/* ============================================
+                            MEDIA AREA — RESPONSIVE HEIGHT
+                            Naka-scale base sa screen size:
+                            - Mobile (< 640px):  50vh
+                            - Tablet (≥ 640px):  60vh
+                            - Laptop (≥ 1024px): 65vh
+                            - Desktop (≥ 1280px): 70vh
+                            - Large TV (≥ 1536px): 75vh
+                            ============================================ */}
+                        <div className="relative w-full bg-black
+                            h-[50vh] min-h-[280px]
+                            sm:h-[60vh] sm:min-h-[350px]
+                            md:h-[65vh] md:min-h-[400px]
+                            lg:h-[70vh] lg:min-h-[450px]
+                            xl:h-[75vh] xl:min-h-[500px]
+                            2xl:h-[78vh] 2xl:min-h-[550px]
+                        ">
                             {currentItem.type === "Video" ? (
                                 <iframe
                                     ref={iframeRef}
@@ -351,7 +369,7 @@ export default function VideoPosterAds() {
                                     key={currentItem._id}
                                     src={convertGoogleDriveImage(currentItem.mediaUrl)}
                                     alt={currentItem.title}
-                                    className="ads-image w-full h-full object-cover"
+                                    className="ads-image w-full h-full object-contain"
                                     onError={(e) => {
                                         console.log("❌ Image failed to load:", e.target.src);
                                         if (currentItem.thumb && e.target.src !== currentItem.thumb) {
@@ -364,6 +382,7 @@ export default function VideoPosterAds() {
                                 />
                             )}
 
+                            {/* Prev Button */}
                             {mediaItems.length > 1 && (
                                 <button
                                     onClick={previousAd}
@@ -373,6 +392,7 @@ export default function VideoPosterAds() {
                                 </button>
                             )}
 
+                            {/* Next Button */}
                             {mediaItems.length > 1 && (
                                 <button
                                     onClick={nextAd}
@@ -383,6 +403,7 @@ export default function VideoPosterAds() {
                             )}
                         </div>
 
+                        {/* Info Footer */}
                         <div className="px-5 py-4 bg-white">
                             <div className="flex items-start justify-between gap-4">
                                 <div className="min-w-0">
@@ -399,6 +420,7 @@ export default function VideoPosterAds() {
                                 </div>
                             </div>
 
+                            {/* Progress Bar */}
                             <div className="mt-3 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                 {currentItem.type === "Poster" && (
                                     <div
