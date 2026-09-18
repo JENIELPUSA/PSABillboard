@@ -243,6 +243,7 @@ export default function VideoPosterAds() {
 
         window.addEventListener("message", handleMessage);
 
+        // Agarang pagpapadala ng play command pagkabukas o paglipat ng slide sa video
         const playTimer = setTimeout(() => {
             try {
                 if (iframeRef.current?.contentWindow) {
@@ -250,12 +251,12 @@ export default function VideoPosterAds() {
                         JSON.stringify({ event: "command", func: "playVideo" }),
                         "*"
                     );
-                    console.log("▶️ Sent playVideo command");
+                    console.log("▶️ Sent playVideo command on slide switch");
                 }
             } catch (e) {
                 console.log("⚠️ Could not send playVideo command");
             }
-        }, 1500);
+        }, 800);
 
         return () => {
             window.removeEventListener("message", handleMessage);
@@ -310,7 +311,7 @@ export default function VideoPosterAds() {
 
             {/* Modal Container */}
             <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 pointer-events-none">
-                <div className="pointer-events-auto w-full max-w-md sm:max-w-lg ads-popup">
+                <div className="pointer-events-auto w-full max-w-2xl sm:max-w-4xl lg:max-w-5xl xl:max-w-6xl ads-popup">
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_70px_rgba(0,0,0,0.6)] border border-slate-200">
                         {/* Top Bar */}
                         <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent">
@@ -336,29 +337,22 @@ export default function VideoPosterAds() {
                         </div>
 
                         {/* ============================================
-                            MEDIA AREA — RESPONSIVE HEIGHT
-                            Naka-scale base sa screen size:
-                            - Mobile (< 640px):  50vh
-                            - Tablet (≥ 640px):  60vh
-                            - Laptop (≥ 1024px): 65vh
-                            - Desktop (≥ 1280px): 70vh
-                            - Large TV (≥ 1536px): 75vh
+                            MEDIA AREA — WIDER, STRETCHED & AUTO-PLAY
                             ============================================ */}
                         <div className="relative w-full bg-black
-                            h-[50vh] min-h-[280px]
-                            sm:h-[60vh] sm:min-h-[350px]
-                            md:h-[65vh] md:min-h-[400px]
-                            lg:h-[70vh] lg:min-h-[450px]
-                            xl:h-[75vh] xl:min-h-[500px]
-                            2xl:h-[78vh] 2xl:min-h-[550px]
+                            h-[40vh] max-h-[400px]
+                            sm:h-[45vh] sm:max-h-[450px]
+                            md:h-[50vh] md:max-h-[500px]
+                            lg:h-[55vh] lg:max-h-[550px]
+                            flex items-center justify-center overflow-hidden
                         ">
                             {currentItem.type === "Video" ? (
                                 <iframe
                                     ref={iframeRef}
                                     key={currentItem._id}
                                     id={`gdrive-player-${currentItem._id}`}
-                                    className="w-full h-full"
-                                    src={`${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1`}
+                                    className="w-full h-full object-cover"
+                                    src={`${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1&auto_play=1`}
                                     title={currentItem.title}
                                     frameBorder="0"
                                     allow="autoplay; encrypted-media; fullscreen"
@@ -369,7 +363,7 @@ export default function VideoPosterAds() {
                                     key={currentItem._id}
                                     src={convertGoogleDriveImage(currentItem.mediaUrl)}
                                     alt={currentItem.title}
-                                    className="ads-image w-full h-full object-contain"
+                                    className="ads-image w-full h-full object-cover"
                                     onError={(e) => {
                                         console.log("❌ Image failed to load:", e.target.src);
                                         if (currentItem.thumb && e.target.src !== currentItem.thumb) {
