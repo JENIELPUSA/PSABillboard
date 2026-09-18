@@ -54,6 +54,7 @@ const FIRST_DELAY_MS = 3000;
 const VIDEO_BUFFER_MS = 2000;
 const MIN_PLAY_TIME_MS = 5000;
 const DEFAULT_REOPEN_MIN = 1;
+const VIDEO_COUNTDOWN_SEC = 5;
 
 // ==========================================
 // MOCK MEDIA DATA
@@ -120,6 +121,10 @@ export default function VideoPosterAds() {
 
     const [isOpen, setIsOpen] = useState(false);
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    // Countdown states
+    const [videoCountdown, setVideoCountdown] = useState(VIDEO_COUNTDOWN_SEC);
+    const [isVideoReady, setIsVideoReady] = useState(false);
 
     const currentItem = mediaItems[currentIndex];
     const iframeRef = useRef(null);
@@ -193,10 +198,43 @@ export default function VideoPosterAds() {
     }, [isOpen, currentIndex, currentItem, goNext]);
 
     // ==========================================
-    // GOOGLE DRIVE VIDEO — AUTO PLAY + CLOSE
+    // VIDEO COUNTDOWN
+    // ==========================================
+    useEffect(() => {
+        if (!isOpen || !currentItem || currentItem.type !== "Video") {
+            setVideoCountdown(VIDEO_COUNTDOWN_SEC);
+            setIsVideoReady(false);
+            return;
+        }
+
+        console.log(
+            `⏱️ Video countdown starts: ${VIDEO_COUNTDOWN_SEC}s bago mag-play`
+        );
+
+        setVideoCountdown(VIDEO_COUNTDOWN_SEC);
+        setIsVideoReady(false);
+
+        const countdownInterval = setInterval(() => {
+            setVideoCountdown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(countdownInterval);
+                    console.log("✅ Countdown finished → mounting iframe with autoplay");
+                    setIsVideoReady(true);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(countdownInterval);
+    }, [isOpen, currentIndex, currentItem]);
+
+    // ==========================================
+    // 🎬 VIDEO CLOSE TIMER — pagkatapos ng countdown
     // ==========================================
     useEffect(() => {
         if (!isOpen || !currentItem || currentItem.type !== "Video") return;
+        if (!isVideoReady) return;
 
         const videoDurationSec = currentItem.video?.timeToShow || 30;
         const closeAfterMs = videoDurationSec * 1000 + VIDEO_BUFFER_MS;
@@ -243,27 +281,11 @@ export default function VideoPosterAds() {
 
         window.addEventListener("message", handleMessage);
 
-        // Agarang pagpapadala ng play command pagkabukas o paglipat ng slide sa video
-        const playTimer = setTimeout(() => {
-            try {
-                if (iframeRef.current?.contentWindow) {
-                    iframeRef.current.contentWindow.postMessage(
-                        JSON.stringify({ event: "command", func: "playVideo" }),
-                        "*"
-                    );
-                    console.log("▶️ Sent playVideo command on slide switch");
-                }
-            } catch (e) {
-                console.log("⚠️ Could not send playVideo command");
-            }
-        }, 800);
-
         return () => {
             window.removeEventListener("message", handleMessage);
-            clearTimeout(playTimer);
             clearTimeout(closeTimer);
         };
-    }, [isOpen, currentIndex, currentItem, closeAd]);
+    }, [isOpen, currentIndex, currentItem, closeAd, isVideoReady]);
 
     // ==========================================
     // MANUAL NEXT / PREVIOUS
@@ -279,10 +301,12 @@ export default function VideoPosterAds() {
         return null;
     }
 
-    const progressDuration =
-        currentItem.type === "Poster"
-            ? currentItem.poster?.timeToShow || 10
-            : currentItem.video?.timeToShow || 30;
+    const isVideo = currentItem.type === "Video";
+    const isPoster = currentItem.type === "Poster";
+
+    const progressDuration = isPoster
+        ? currentItem.poster?.timeToShow || 10
+        : currentItem.video?.timeToShow || 30;
 
     return (
         <>
@@ -299,8 +323,13 @@ export default function VideoPosterAds() {
           from { width: 0%; }
           to { width: 100%; }
         }
+        @keyframes countdownPulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.1); opacity: 0.85; }
+        }
         .ads-popup { animation: adSlideIn 0.5s ease-out; }
         .ads-image { animation: adFade 0.4s ease-in; }
+        .countdown-pulse { animation: countdownPulse 1s ease-in-out infinite; }
       `}</style>
 
             {/* Backdrop */}
@@ -311,7 +340,13 @@ export default function VideoPosterAds() {
 
             {/* Modal Container */}
             <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 pointer-events-none">
-                <div className="pointer-events-auto w-full max-w-2xl sm:max-w-4xl lg:max-w-5xl xl:max-w-6xl ads-popup">
+                <div
+                    className={`pointer-events-auto w-full ads-popup transition-all duration-300 ${
+                        isVideo
+                            ? "max-w-2xl sm:max-w-4xl lg:max-w-5xl xl:max-w-6xl"
+                            : "max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl"
+                    }`}
+                >
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_70px_rgba(0,0,0,0.6)] border border-slate-200">
                         {/* Top Bar */}
                         <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent">
@@ -320,7 +355,7 @@ export default function VideoPosterAds() {
                                     Advertisement
                                 </span>
 
-                                {currentItem.type === "Video" && (
+                                {isVideo && (
                                     <span className="text-[11px] text-white/90 font-medium">
                                         ▶ Video
                                     </span>
@@ -336,28 +371,88 @@ export default function VideoPosterAds() {
                             </button>
                         </div>
 
-                        {/* ============================================
-                            MEDIA AREA — WIDER, STRETCHED & AUTO-PLAY
-                            ============================================ */}
-                        <div className="relative w-full bg-black
-                            h-[40vh] max-h-[400px]
-                            sm:h-[45vh] sm:max-h-[450px]
-                            md:h-[50vh] md:max-h-[500px]
-                            lg:h-[55vh] lg:max-h-[550px]
-                            flex items-center justify-center overflow-hidden
-                        ">
-                            {currentItem.type === "Video" ? (
-                                <iframe
-                                    ref={iframeRef}
-                                    key={currentItem._id}
-                                    id={`gdrive-player-${currentItem._id}`}
-                                    className="w-full h-full object-cover"
-                                    src={`${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1&auto_play=1`}
-                                    title={currentItem.title}
-                                    frameBorder="0"
-                                    allow="autoplay; encrypted-media; fullscreen"
-                                    allowFullScreen
-                                />
+                        {/* Media Area */}
+                        <div
+                            className={`relative w-full bg-black flex items-center justify-center overflow-hidden ${
+                                isVideo
+                                    ? "h-[40vh] max-h-[400px] sm:h-[45vh] sm:max-h-[450px] md:h-[50vh] md:max-h-[500px] lg:h-[55vh] lg:max-h-[550px]"
+                                    : "h-[70vh] max-h-[700px] min-h-[400px] sm:h-[75vh] sm:max-h-[780px] sm:min-h-[450px] md:h-[80vh] md:max-h-[850px] md:min-h-[500px] lg:h-[85vh] lg:max-h-[900px] lg:min-h-[550px]"
+                            }`}
+                        >
+                            {isVideo ? (
+                                <>
+                                    {/* Countdown Overlay — nawawala pag ready na */}
+                                    {!isVideoReady && (
+                                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
+                                            <div className="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                                                <svg
+                                                    className="absolute inset-0 w-full h-full -rotate-90"
+                                                    viewBox="0 0 100 100"
+                                                >
+                                                    <circle
+                                                        cx="50"
+                                                        cy="50"
+                                                        r="45"
+                                                        fill="none"
+                                                        stroke="rgba(255,255,255,0.15)"
+                                                        strokeWidth="4"
+                                                    />
+                                                    <circle
+                                                        cx="50"
+                                                        cy="50"
+                                                        r="45"
+                                                        fill="none"
+                                                        stroke="#f43f5e"
+                                                        strokeWidth="4"
+                                                        strokeLinecap="round"
+                                                        strokeDasharray="283"
+                                                        strokeDashoffset={
+                                                            283 -
+                                                            (283 * (VIDEO_COUNTDOWN_SEC - videoCountdown)) /
+                                                                VIDEO_COUNTDOWN_SEC
+                                                        }
+                                                        style={{
+                                                            transition: "stroke-dashoffset 1s linear",
+                                                        }}
+                                                    />
+                                                </svg>
+
+                                                <span className="countdown-pulse text-5xl sm:text-6xl font-bold text-white tabular-nums">
+                                                    {videoCountdown}
+                                                </span>
+                                            </div>
+
+                                            <p className="mt-6 text-sm sm:text-base text-white/70 font-medium tracking-wide uppercase">
+                                                Video starting in...
+                                            </p>
+
+                                            <div className="mt-3 flex items-center gap-1.5">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce" style={{ animationDelay: "0ms" }} />
+                                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce" style={{ animationDelay: "150ms" }} />
+                                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* ============================================
+                                        IFRAME — I-MOUNT LANG PAGKATAPOS NG COUNTDOWN
+                                        Ito ang key fix: hindi natin i-mount agad,
+                                        kaya pag-mount pa lang, autoplay na agad
+                                        ============================================ */}
+                                    {isVideoReady && (
+                                        <iframe
+                                            ref={iframeRef}
+                                            key={`video-${currentItem._id}-${Date.now()}`}
+                                            id={`gdrive-player-${currentItem._id}`}
+                                            className="w-full h-full object-cover"
+                                            src={`${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1`}
+                                            title={currentItem.title}
+                                            frameBorder="0"
+                                            allow="autoplay; encrypted-media; fullscreen"
+                                            allowFullScreen
+                                        />
+                                    )}
+                                </>
                             ) : (
                                 <img
                                     key={currentItem._id}
@@ -416,7 +511,7 @@ export default function VideoPosterAds() {
 
                             {/* Progress Bar */}
                             <div className="mt-3 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                {currentItem.type === "Poster" && (
+                                {isPoster && (
                                     <div
                                         key={currentItem._id}
                                         className="h-full bg-rose-500 rounded-full"
