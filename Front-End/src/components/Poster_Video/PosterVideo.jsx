@@ -54,7 +54,7 @@ const FIRST_DELAY_MS = 3000;
 const VIDEO_BUFFER_MS = 2000;
 const MIN_PLAY_TIME_MS = 5000;
 const DEFAULT_REOPEN_MIN = 1;
-const VIDEO_COUNTDOWN_SEC = 5;
+const VIDEO_COUNTDOWN_SEC = 10;
 
 // ==========================================
 // MOCK MEDIA DATA
@@ -218,7 +218,7 @@ export default function VideoPosterAds() {
             setVideoCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(countdownInterval);
-                    console.log("✅ Countdown finished → mounting iframe with autoplay");
+                    console.log("✅ Countdown finished → remounting iframe with autoplay");
                     setIsVideoReady(true);
                     return 0;
                 }
@@ -308,6 +308,11 @@ export default function VideoPosterAds() {
         ? currentItem.poster?.timeToShow || 10
         : currentItem.video?.timeToShow || 30;
 
+    // ==========================================
+    // VIDEO SRC — may autoplay=1
+    // ==========================================
+    const videoSrc = `${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1`;
+
     return (
         <>
             <style>{`
@@ -344,7 +349,7 @@ export default function VideoPosterAds() {
                     className={`pointer-events-auto w-full ads-popup transition-all duration-300 ${
                         isVideo
                             ? "max-w-2xl sm:max-w-4xl lg:max-w-5xl xl:max-w-6xl"
-                            : "max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl"
+                            : "max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"
                     }`}
                 >
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_70px_rgba(0,0,0,0.6)] border border-slate-200">
@@ -381,7 +386,34 @@ export default function VideoPosterAds() {
                         >
                             {isVideo ? (
                                 <>
-                                    {/* Countdown Overlay — nawawala pag ready na */}
+                                    {/* Iframe — naka-mount AGAD pero WALANG autoplay habang countdown.
+                                        Kapag isVideoReady = true, mag-re-remount ito na may
+                                        autoplay=1 dahil nagbago ang key. */}
+                                    <iframe
+                                        ref={iframeRef}
+                                        key={
+                                            isVideoReady
+                                                ? `video-autoplay-${currentItem._id}`
+                                                : `video-preload-${currentItem._id}`
+                                        }
+                                        id={`gdrive-player-${currentItem._id}`}
+                                        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
+                                            isVideoReady
+                                                ? "opacity-100 z-10"
+                                                : "opacity-0 z-0 pointer-events-none"
+                                        }`}
+                                        src={
+                                            isVideoReady
+                                                ? videoSrc
+                                                : convertGoogleDriveUrl(currentItem.mediaUrl)
+                                        }
+                                        title={currentItem.title}
+                                        frameBorder="0"
+                                        allow="autoplay; encrypted-media; fullscreen"
+                                        allowFullScreen
+                                    />
+
+                                    {/* Countdown Overlay */}
                                     {!isVideoReady && (
                                         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
                                             <div className="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
@@ -427,30 +459,20 @@ export default function VideoPosterAds() {
                                             </p>
 
                                             <div className="mt-3 flex items-center gap-1.5">
-                                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce" style={{ animationDelay: "0ms" }} />
-                                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce" style={{ animationDelay: "150ms" }} />
-                                                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce" style={{ animationDelay: "300ms" }} />
+                                                <span
+                                                    className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce"
+                                                    style={{ animationDelay: "0ms" }}
+                                                />
+                                                <span
+                                                    className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce"
+                                                    style={{ animationDelay: "150ms" }}
+                                                />
+                                                <span
+                                                    className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-bounce"
+                                                    style={{ animationDelay: "300ms" }}
+                                                />
                                             </div>
                                         </div>
-                                    )}
-
-                                    {/* ============================================
-                                        IFRAME — I-MOUNT LANG PAGKATAPOS NG COUNTDOWN
-                                        Ito ang key fix: hindi natin i-mount agad,
-                                        kaya pag-mount pa lang, autoplay na agad
-                                        ============================================ */}
-                                    {isVideoReady && (
-                                        <iframe
-                                            ref={iframeRef}
-                                            key={`video-${currentItem._id}-${Date.now()}`}
-                                            id={`gdrive-player-${currentItem._id}`}
-                                            className="w-full h-full object-cover"
-                                            src={`${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1`}
-                                            title={currentItem.title}
-                                            frameBorder="0"
-                                            allow="autoplay; encrypted-media; fullscreen"
-                                            allowFullScreen
-                                        />
                                     )}
                                 </>
                             ) : (
