@@ -22,36 +22,32 @@ const convertGoogleDriveUrl = (url) => {
 // ==========================================
 // YOUTUBE URL CONVERTER (Video)
 // ==========================================
-const convertYouTubeUrl = (url) => {
+const convertYouTubeUrl = (url, muted = true) => {
     if (!url) return url;
 
     let videoId = null;
 
-    // youtube.com/watch?v=VIDEO_ID
     const watchMatch = url.match(/[?&]v=([^&]+)/);
     if (watchMatch && watchMatch[1]) videoId = watchMatch[1];
 
-    // youtu.be/VIDEO_ID
     if (!videoId) {
         const shortMatch = url.match(/youtu\.be\/([^?&]+)/);
         if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
     }
 
-    // youtube.com/embed/VIDEO_ID
     if (!videoId) {
         const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
         if (embedMatch && embedMatch[1]) videoId = embedMatch[1];
     }
 
-    // youtube.com/shorts/VIDEO_ID
     if (!videoId) {
         const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&]+)/);
         if (shortsMatch && shortsMatch[1]) videoId = shortsMatch[1];
     }
 
     if (videoId) {
-        // autoplay=1 + mute=0 (may audio) + playsinline + rel=0
-        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1`;
+        const muteParam = muted ? 1 : 0;
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${muteParam}&playsinline=1&rel=0&modestbranding=1&enablejsapi=1`;
     }
 
     return url;
@@ -63,12 +59,10 @@ const convertYouTubeUrl = (url) => {
 const convertVideoUrl = (url, options = {}) => {
     if (!url) return url;
 
-    // YouTube?
     if (url.includes("youtube.com") || url.includes("youtu.be")) {
-        return convertYouTubeUrl(url);
+        return convertYouTubeUrl(url, options.muted !== false);
     }
 
-    // Google Drive?
     if (url.includes("drive.google.com")) {
         const base = convertGoogleDriveUrl(url);
         const autoplay = options.autoplay ? "?autoplay=1" : "";
@@ -116,11 +110,10 @@ const DEFAULT_REOPEN_MIN = 1;
 const VIDEO_COUNTDOWN_SEC = 10;
 
 // ==========================================
-// 🎬 AUTOPLAY CONFIG
+// 🎬 AUTOPLAY + UNMUTE CONFIG
 // ==========================================
-// false = MAY AUDIO (kailangan ng browser flag sa billboard)
-// true  = NAKA-MUTE (siguradong autoplay kahit saan)
-const VIDEO_MUTED = false;
+// Ilang segundo bago i-unmute pagkatapos mag-play
+const UNMUTE_AFTER_SEC = 2;
 
 // ==========================================
 // MOCK MEDIA DATA
@@ -176,9 +169,6 @@ const initialMediaItems = [
         order: 3,
         description: "",
     },
-    // ==========================================
-    // YOUTUBE VIDEO
-    // ==========================================
     {
         _id: "65a1b2c3d4e5f6789012345e",
         type: "Video",
@@ -210,8 +200,12 @@ export default function VideoPosterAds() {
     const [videoCountdown, setVideoCountdown] = useState(VIDEO_COUNTDOWN_SEC);
     const [isVideoReady, setIsVideoReady] = useState(false);
 
+    // 🎬 Mute-then-unmute state
+    const [isUnmuted, setIsUnmuted] = useState(false);
+
     const currentItem = mediaItems[currentIndex];
     const iframeRef = useRef(null);
+    const unmuteTimerRef = useRef(null);
 
     // ==========================================
     // CLOSE AD
@@ -288,6 +282,7 @@ export default function VideoPosterAds() {
         if (!isOpen || !currentItem || currentItem.type !== "Video") {
             setVideoCountdown(VIDEO_COUNTDOWN_SEC);
             setIsVideoReady(false);
+            setIsUnmuted(false);
             return;
         }
 
@@ -297,12 +292,13 @@ export default function VideoPosterAds() {
 
         setVideoCountdown(VIDEO_COUNTDOWN_SEC);
         setIsVideoReady(false);
+        setIsUnmuted(false);
 
         const countdownInterval = setInterval(() => {
             setVideoCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(countdownInterval);
-                    console.log("✅ Countdown finished → remounting iframe with autoplay");
+                    console.log("✅ Countdown finished → playing video (muted muna)");
                     setIsVideoReady(true);
                     return 0;
                 }
@@ -314,7 +310,70 @@ export default function VideoPosterAds() {
     }, [isOpen, currentIndex, currentItem]);
 
     // ==========================================
-    // 🎬 VIDEO CLOSE TIMER — pagkatapos ng countdown
+    // 🎬 UNMUTE AFTER N SECONDS
+    // ==========================================
+    useEffect(() => {
+        if (!isVideoReady || !currentItem || currentItem.type !== "Video") return;
+
+        console.log(`🔇 Video playing muted → unmuting in ${UNMUTE_AFTER_SEC}s`);
+
+        unmuteTimerRef.current = setTimeout(() => {
+            console.log("🔊 Unmuting video now");
+            setIsUnmuted(true);
+        }, UNMUTE_AFTER_SEC * 1000);
+
+        return () => {
+            if (unmuteTimerRef.current) {
+                clearTimeout(unmuteTimerRef.current);
+            }
+        };
+    }, [isVideoReady, currentItem]);
+
+    // ==========================================
+    // 🎬 SEND UNMUTE COMMAND SA IFRAME
+    // ==========================================
+    useEffect(() => {
+        if (!isUnmuted || !iframeRef.current) return;
+        if (!currentItem || currentItem.type !== "Video") return;
+
+        const iframe = iframeRef.current;
+        const url = currentItem.mediaUrl || "";
+        const isYouTube = url.includes("youtube.com") || url.includes("youtu.be");
+
+        if (isYouTube) {
+            // YouTube: send unMute command
+            try {
+                iframe.contentWindow?.postMessage(
+                    JSON.stringify({
+                        event: "command",
+                        func: "unMute",
+                        args: [],
+                    }),
+                    "*"
+                );
+                iframe.contentWindow?.postMessage(
+                    JSON.stringify({
+                        event: "command",
+                        func: "setVolume",
+                        args: [100],
+                    }),
+                    "*"
+                );
+                console.log("🔊 YouTube unMute command sent");
+            } catch (err) {
+                console.warn("⚠️ YouTube unMute failed:", err);
+            }
+        } else {
+            // Google Drive: walang direct API, kaya i-reload ang iframe
+            // na may autoplay=1 (walang mute) para mag-play with sound
+            console.log("🔊 Google Drive — reloading iframe with sound");
+            const baseUrl = convertGoogleDriveUrl(url);
+            iframe.src = `${baseUrl}?autoplay=1`;
+        }
+    }, [isUnmuted, currentItem]);
+
+    // ==========================================
+    // 🎬 VIDEO CLOSE TIMER
     // ==========================================
     useEffect(() => {
         if (!isOpen || !currentItem || currentItem.type !== "Video") return;
@@ -353,8 +412,11 @@ export default function VideoPosterAds() {
             const eventName = data.event || data.type;
             console.log("📩 Media message:", eventName);
 
-            if (eventName === "ended" || eventName === "finish" || eventName === "onStateChange") {
-                // YouTube: 0 = ended
+            if (
+                eventName === "ended" ||
+                eventName === "finish" ||
+                eventName === "onStateChange"
+            ) {
                 if (eventName === "onStateChange" && data.info !== 0) return;
 
                 const elapsed = Date.now() - playStartTime;
@@ -399,18 +461,37 @@ export default function VideoPosterAds() {
         : currentItem.video?.timeToShow || 30;
 
     // ==========================================
-    // VIDEO SRC — preload (walang autoplay)
+    // VIDEO SRC — preload (muted, walang autoplay)
     // ==========================================
     const videoSrcPreload = convertVideoUrl(currentItem.mediaUrl, {
         autoplay: false,
+        muted: true,
     });
 
     // ==========================================
-    // VIDEO SRC — with autoplay
+    // VIDEO SRC — autoplay MUTED muna
     // ==========================================
-    const videoSrcAutoplay = convertVideoUrl(currentItem.mediaUrl, {
+    const videoSrcAutoplayMuted = convertVideoUrl(currentItem.mediaUrl, {
         autoplay: true,
+        muted: true,
     });
+
+    // ==========================================
+    // VIDEO SRC — autoplay WITH SOUND (pagkatapos ng unmute)
+    // ==========================================
+    const videoSrcAutoplaySound = convertVideoUrl(currentItem.mediaUrl, {
+        autoplay: true,
+        muted: false,
+    });
+
+    // ==========================================
+    // PILIIN ANG SRC BATAY SA STATE
+    // ==========================================
+    const currentVideoSrc = !isVideoReady
+        ? videoSrcPreload
+        : isUnmuted
+        ? videoSrcAutoplaySound
+        : videoSrcAutoplayMuted;
 
     return (
         <>
@@ -461,7 +542,7 @@ export default function VideoPosterAds() {
 
                                 {isVideo && (
                                     <span className="text-[11px] text-white/90 font-medium">
-                                        ▶ Video {VIDEO_MUTED ? "(muted)" : ""}
+                                        ▶ Video {isUnmuted ? "🔊" : "🔇"}
                                     </span>
                                 )}
                             </div>
@@ -485,27 +566,20 @@ export default function VideoPosterAds() {
                         >
                             {isVideo ? (
                                 <>
-                                    {/* Iframe — naka-mount AGAD pero WALANG autoplay habang countdown.
-                                        Kapag isVideoReady = true, mag-re-remount ito na may
-                                        autoplay=1 dahil nagbago ang key. */}
+                                    {/* Iframe — nag-re-remount kapag nagbago ang src
+                                        (muted → unmuted) */}
                                     <iframe
                                         ref={iframeRef}
-                                        key={
-                                            isVideoReady
-                                                ? `video-autoplay-${currentItem._id}`
-                                                : `video-preload-${currentItem._id}`
-                                        }
+                                        key={`video-${currentItem._id}-${
+                                            isVideoReady ? "play" : "preload"
+                                        }-${isUnmuted ? "sound" : "muted"}`}
                                         id={`media-player-${currentItem._id}`}
                                         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                                             isVideoReady
                                                 ? "opacity-100 z-10"
                                                 : "opacity-0 z-0 pointer-events-none"
                                         }`}
-                                        src={
-                                            isVideoReady
-                                                ? videoSrcAutoplay
-                                                : videoSrcPreload
-                                        }
+                                        src={currentVideoSrc}
                                         title={currentItem.title}
                                         frameBorder="0"
                                         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
