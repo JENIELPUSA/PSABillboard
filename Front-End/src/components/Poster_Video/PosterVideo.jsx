@@ -20,6 +20,65 @@ const convertGoogleDriveUrl = (url) => {
 };
 
 // ==========================================
+// YOUTUBE URL CONVERTER (Video)
+// ==========================================
+const convertYouTubeUrl = (url) => {
+    if (!url) return url;
+
+    let videoId = null;
+
+    // youtube.com/watch?v=VIDEO_ID
+    const watchMatch = url.match(/[?&]v=([^&]+)/);
+    if (watchMatch && watchMatch[1]) videoId = watchMatch[1];
+
+    // youtu.be/VIDEO_ID
+    if (!videoId) {
+        const shortMatch = url.match(/youtu\.be\/([^?&]+)/);
+        if (shortMatch && shortMatch[1]) videoId = shortMatch[1];
+    }
+
+    // youtube.com/embed/VIDEO_ID
+    if (!videoId) {
+        const embedMatch = url.match(/youtube\.com\/embed\/([^?&]+)/);
+        if (embedMatch && embedMatch[1]) videoId = embedMatch[1];
+    }
+
+    // youtube.com/shorts/VIDEO_ID
+    if (!videoId) {
+        const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&]+)/);
+        if (shortsMatch && shortsMatch[1]) videoId = shortsMatch[1];
+    }
+
+    if (videoId) {
+        // autoplay=1 + mute=0 (may audio) + playsinline + rel=0
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&playsinline=1&rel=0&modestbranding=1`;
+    }
+
+    return url;
+};
+
+// ==========================================
+// UNIVERSAL VIDEO URL CONVERTER
+// ==========================================
+const convertVideoUrl = (url, options = {}) => {
+    if (!url) return url;
+
+    // YouTube?
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+        return convertYouTubeUrl(url);
+    }
+
+    // Google Drive?
+    if (url.includes("drive.google.com")) {
+        const base = convertGoogleDriveUrl(url);
+        const autoplay = options.autoplay ? "?autoplay=1" : "";
+        return `${base}${autoplay}`;
+    }
+
+    return url;
+};
+
+// ==========================================
 // GOOGLE DRIVE IMAGE URL CONVERTER
 // ==========================================
 const convertGoogleDriveImage = (url) => {
@@ -55,6 +114,13 @@ const VIDEO_BUFFER_MS = 2000;
 const MIN_PLAY_TIME_MS = 5000;
 const DEFAULT_REOPEN_MIN = 1;
 const VIDEO_COUNTDOWN_SEC = 10;
+
+// ==========================================
+// 🎬 AUTOPLAY CONFIG
+// ==========================================
+// false = MAY AUDIO (kailangan ng browser flag sa billboard)
+// true  = NAKA-MUTE (siguradong autoplay kahit saan)
+const VIDEO_MUTED = false;
 
 // ==========================================
 // MOCK MEDIA DATA
@@ -108,6 +174,24 @@ const initialMediaItems = [
         reopenAfterMin: 1,
         isActive: true,
         order: 3,
+        description: "",
+    },
+    // ==========================================
+    // YOUTUBE VIDEO
+    // ==========================================
+    {
+        _id: "65a1b2c3d4e5f6789012345e",
+        type: "Video",
+        title: "YOUTUBE SAMPLE",
+        mediaUrl: "https://youtu.be/KH3YsXh3D3I",
+        thumb:
+            "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop",
+        showDate: "2026-10-05T00:00:00.000Z",
+        poster: { timeToShow: 5 },
+        video: { showTime: "08:00", exitTime: "17:00", timeToShow: 60 },
+        reopenAfterMin: 1,
+        isActive: true,
+        order: 4,
         description: "",
     },
 ];
@@ -251,7 +335,10 @@ export default function VideoPosterAds() {
         }, closeAfterMs);
 
         const handleMessage = (event) => {
-            if (!event.origin || !event.origin.includes("drive.google.com")) return;
+            if (!event.origin) return;
+            const isDrive = event.origin.includes("drive.google.com");
+            const isYouTube = event.origin.includes("youtube.com");
+            if (!isDrive && !isYouTube) return;
 
             let data = event.data;
             if (typeof data === "string") {
@@ -264,9 +351,12 @@ export default function VideoPosterAds() {
             if (!data || typeof data !== "object") return;
 
             const eventName = data.event || data.type;
-            console.log("📩 Drive message:", eventName);
+            console.log("📩 Media message:", eventName);
 
-            if (eventName === "ended" || eventName === "finish") {
+            if (eventName === "ended" || eventName === "finish" || eventName === "onStateChange") {
+                // YouTube: 0 = ended
+                if (eventName === "onStateChange" && data.info !== 0) return;
+
                 const elapsed = Date.now() - playStartTime;
 
                 if (elapsed < MIN_PLAY_TIME_MS) {
@@ -309,9 +399,18 @@ export default function VideoPosterAds() {
         : currentItem.video?.timeToShow || 30;
 
     // ==========================================
-    // VIDEO SRC — may autoplay=1
+    // VIDEO SRC — preload (walang autoplay)
     // ==========================================
-    const videoSrc = `${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1`;
+    const videoSrcPreload = convertVideoUrl(currentItem.mediaUrl, {
+        autoplay: false,
+    });
+
+    // ==========================================
+    // VIDEO SRC — with autoplay
+    // ==========================================
+    const videoSrcAutoplay = convertVideoUrl(currentItem.mediaUrl, {
+        autoplay: true,
+    });
 
     return (
         <>
@@ -348,8 +447,8 @@ export default function VideoPosterAds() {
                 <div
                     className={`pointer-events-auto w-full ads-popup transition-all duration-300 ${
                         isVideo
-                            ? "max-w-2xl sm:max-w-4xl lg:max-w-5xl xl:max-w-6xl"
-                            : "max-w-lg sm:max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"
+                            ? "max-w-3xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl"
+                            : "max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl"
                     }`}
                 >
                     <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_70px_rgba(0,0,0,0.6)] border border-slate-200">
@@ -362,7 +461,7 @@ export default function VideoPosterAds() {
 
                                 {isVideo && (
                                     <span className="text-[11px] text-white/90 font-medium">
-                                        ▶ Video
+                                        ▶ Video {VIDEO_MUTED ? "(muted)" : ""}
                                     </span>
                                 )}
                             </div>
@@ -376,12 +475,12 @@ export default function VideoPosterAds() {
                             </button>
                         </div>
 
-                        {/* Media Area */}
+                        {/* Media Area — MAS MATAAS NA HEIGHT */}
                         <div
                             className={`relative w-full bg-black flex items-center justify-center overflow-hidden ${
                                 isVideo
-                                    ? "h-[40vh] max-h-[400px] sm:h-[45vh] sm:max-h-[450px] md:h-[50vh] md:max-h-[500px] lg:h-[55vh] lg:max-h-[550px]"
-                                    : "h-[70vh] max-h-[700px] min-h-[400px] sm:h-[75vh] sm:max-h-[780px] sm:min-h-[450px] md:h-[80vh] md:max-h-[850px] md:min-h-[500px] lg:h-[85vh] lg:max-h-[900px] lg:min-h-[550px]"
+                                    ? "h-[55vh] max-h-[600px] sm:h-[60vh] sm:max-h-[650px] md:h-[65vh] md:max-h-[700px] lg:h-[70vh] lg:max-h-[800px] xl:h-[75vh] xl:max-h-[900px]"
+                                    : "h-[80vh] max-h-[850px] min-h-[500px] sm:h-[85vh] sm:max-h-[900px] sm:min-h-[550px] md:h-[90vh] md:max-h-[1000px] md:min-h-[600px] lg:h-[92vh] lg:max-h-[1100px] lg:min-h-[650px]"
                             }`}
                         >
                             {isVideo ? (
@@ -396,7 +495,7 @@ export default function VideoPosterAds() {
                                                 ? `video-autoplay-${currentItem._id}`
                                                 : `video-preload-${currentItem._id}`
                                         }
-                                        id={`gdrive-player-${currentItem._id}`}
+                                        id={`media-player-${currentItem._id}`}
                                         className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${
                                             isVideoReady
                                                 ? "opacity-100 z-10"
@@ -404,19 +503,19 @@ export default function VideoPosterAds() {
                                         }`}
                                         src={
                                             isVideoReady
-                                                ? videoSrc
-                                                : convertGoogleDriveUrl(currentItem.mediaUrl)
+                                                ? videoSrcAutoplay
+                                                : videoSrcPreload
                                         }
                                         title={currentItem.title}
                                         frameBorder="0"
-                                        allow="autoplay; encrypted-media; fullscreen"
+                                        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
                                         allowFullScreen
                                     />
 
                                     {/* Countdown Overlay */}
                                     {!isVideoReady && (
                                         <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-gradient-to-br from-black via-slate-900 to-black">
-                                            <div className="relative w-32 h-32 sm:w-40 sm:h-40 flex items-center justify-center">
+                                            <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 flex items-center justify-center">
                                                 <svg
                                                     className="absolute inset-0 w-full h-full -rotate-90"
                                                     viewBox="0 0 100 100"
@@ -449,12 +548,12 @@ export default function VideoPosterAds() {
                                                     />
                                                 </svg>
 
-                                                <span className="countdown-pulse text-5xl sm:text-6xl font-bold text-white tabular-nums">
+                                                <span className="countdown-pulse text-5xl sm:text-6xl md:text-7xl font-bold text-white tabular-nums">
                                                     {videoCountdown}
                                                 </span>
                                             </div>
 
-                                            <p className="mt-6 text-sm sm:text-base text-white/70 font-medium tracking-wide uppercase">
+                                            <p className="mt-6 text-sm sm:text-base md:text-lg text-white/70 font-medium tracking-wide uppercase">
                                                 Video starting in...
                                             </p>
 
