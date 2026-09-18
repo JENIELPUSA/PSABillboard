@@ -1,0 +1,419 @@
+import React, { useEffect, useState, useRef, useCallback } from "react";
+
+// ==========================================
+// GOOGLE DRIVE URL CONVERTER (Video)
+// ==========================================
+const convertGoogleDriveUrl = (url) => {
+    if (!url) return url;
+
+    const match = url.match(/\/file\/d\/([^/]+)/);
+    if (match && match[1]) {
+        return `https://drive.google.com/file/d/${match[1]}/preview`;
+    }
+
+    const idMatch = url.match(/[?&]id=([^&]+)/);
+    if (idMatch && idMatch[1]) {
+        return `https://drive.google.com/file/d/${idMatch[1]}/preview`;
+    }
+
+    return url;
+};
+
+// ==========================================
+// GOOGLE DRIVE IMAGE URL CONVERTER
+// ==========================================
+const convertGoogleDriveImage = (url) => {
+    if (!url) return url;
+
+    let fileId = null;
+
+    const ucMatch = url.match(/[?&]id=([^&]+)/);
+    if (ucMatch && ucMatch[1]) fileId = ucMatch[1];
+
+    if (!fileId) {
+        const fileMatch = url.match(/\/file\/d\/([^/]+)/);
+        if (fileMatch && fileMatch[1]) fileId = fileMatch[1];
+    }
+
+    if (!fileId) {
+        const lh3Match = url.match(/googleusercontent\.com\/d\/([^/]+)/);
+        if (lh3Match && lh3Match[1]) fileId = lh3Match[1];
+    }
+
+    if (fileId) {
+        return `https://drive.google.com/thumbnail?sz=w1600&id=${fileId}`;
+    }
+
+    return url;
+};
+
+// ==========================================
+// CONFIG
+// ==========================================
+const FIRST_DELAY_MS = 3000;   // 3 seconds bago unang labas
+const VIDEO_BUFFER_MS = 2000;  // +2s buffer sa video duration
+const MIN_PLAY_TIME_MS = 5000; // Huwag pansinin ang "ended" kung < 5s pa
+const DEFAULT_REOPEN_MIN = 1;  // Default countdown kung walang reopenAfterMin
+
+// ==========================================
+// MOCK MEDIA DATA — VIDEO ANG HULI
+// ==========================================
+const initialMediaItems = [
+    {
+        _id: "65a1b2c3d4e5f6789012345b",
+        type: "Poster",
+        title: "LABANAN ANG RED TAPE",
+        mediaUrl:
+            "https://drive.google.com/file/d/1b_avhQwgfgHwSyAsOUPnOYsSKwRYlIzG/view?usp=drive_link",
+        thumb:
+            "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?q=80&w=300&auto=format&fit=crop",
+        showDate: "2026-10-02T00:00:00.000Z",
+        poster: { timeToShow: 8 },
+        video: { showTime: "09:00", exitTime: "18:00", timeToShow: 30 },
+        reopenAfterMin: 1,
+        isActive: true,
+        order: 1, // 👈 1st
+        description:
+            "Ang paglaban sa red tape ay tumutukoy sa pagsisikap na bawasan ang hindi kinakailangang proseso, dokumento, pirma, at matagal na paghihintay upang maging mas mabilis, simple, malinaw, at episyente ang paghahatid ng serbisyo publiko.",
+    },
+    {
+        _id: "65a1b2c3d4e5f6789012345d",
+        type: "Poster",
+        title: "BAWAL ANG RED TAPE",
+        mediaUrl:
+            "https://drive.google.com/uc?export=view&id=1y_HOKye39X7d9UmefRoGfQ0xm2bqEfqk",
+        thumb:
+            "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=300&auto=format&fit=crop",
+        showDate: "2026-10-04T00:00:00.000Z",
+        poster: { timeToShow: 12 },
+        video: { showTime: "10:00", exitTime: "16:00", timeToShow: 30 },
+        reopenAfterMin: 1,
+        isActive: true,
+        order: 2,
+        description:
+            "Red tape refers to excessive, unnecessary, or complicated rules, procedures, paperwork, and approval processes that cause delays in providing services or completing transactions.",
+    },
+    {
+        _id: "65a1b2c3d4e5f6789012345c",
+        type: "Video",
+        title: "CRASM",
+        mediaUrl:
+            "https://drive.google.com/file/d/18JcX-99EGOXBfltXwTbNPWwkBccbQKru/view",
+        thumb:
+            "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=300&auto=format&fit=crop",
+        showDate: "2026-10-03T00:00:00.000Z",
+        poster: { timeToShow: 5 },
+        video: { showTime: "08:00", exitTime: "17:00", timeToShow: 177 }, // 2:57
+        reopenAfterMin: 1,
+        isActive: true,
+        order: 3,
+        description:
+            "",
+    },
+];
+
+export default function VideoPosterAds() {
+    const [mediaItems] = useState(
+        initialMediaItems
+            .filter((item) => item.isActive)
+            .sort((a, b) => a.order - b.order)
+    );
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    const currentItem = mediaItems[currentIndex];
+    const iframeRef = useRef(null);
+
+    // ==========================================
+    // CLOSE AD — dynamic countdown base sa reopenAfterMin
+    // ==========================================
+    const closeAd = useCallback(() => {
+        const reopenMin = currentItem?.reopenAfterMin ?? DEFAULT_REOPEN_MIN;
+        const reopenDelayMs = reopenMin * 60 * 1000;
+
+        console.log(
+            `🔒 Popup closing → ${reopenMin} min (${reopenDelayMs / 1000}s) countdown starts`
+        );
+
+        setIsOpen(false);
+        window.dispatchEvent(
+            new CustomEvent("ad-closed", { detail: { delay: reopenDelayMs } })
+        );
+    }, [currentItem]);
+
+    // ==========================================
+    // POPUP SCHEDULER (recursive timeout)
+    // ==========================================
+    useEffect(() => {
+        let timer;
+
+        const scheduleNext = (delay) => {
+            clearTimeout(timer);
+            console.log(`⏰ Next popup in ${delay / 1000}s (${delay / 60000} min)`);
+            timer = setTimeout(() => {
+                console.log("🚀 Popup opening now");
+                setIsOpen(true);
+                setCurrentIndex(0);
+            }, delay);
+        };
+
+        scheduleNext(FIRST_DELAY_MS);
+
+        const handleReopen = (e) => {
+            const delay = e?.detail?.delay ?? DEFAULT_REOPEN_MIN * 60 * 1000;
+            scheduleNext(delay);
+        };
+        window.addEventListener("ad-closed", handleReopen);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener("ad-closed", handleReopen);
+        };
+    }, []);
+
+    // ==========================================
+    // GO TO NEXT AD
+    // ==========================================
+    const goNext = useCallback(() => {
+        setCurrentIndex((prev) => (prev + 1) % mediaItems.length);
+    }, [mediaItems.length]);
+
+    // ==========================================
+    // AUTO NEXT AD (POSTER ONLY)
+    // ==========================================
+    useEffect(() => {
+        if (!isOpen || !currentItem) return;
+        if (currentItem.type === "Video") return;
+
+        const duration = currentItem.poster?.timeToShow || 10;
+        console.log(`🖼️ Poster "${currentItem.title}" → next in ${duration}s`);
+
+        const timer = setTimeout(() => goNext(), duration * 1000);
+        return () => clearTimeout(timer);
+    }, [isOpen, currentIndex, currentItem, goNext]);
+
+    // ==========================================
+    // GOOGLE DRIVE VIDEO — AUTO PLAY + CLOSE
+    // ==========================================
+    useEffect(() => {
+        if (!isOpen || !currentItem || currentItem.type !== "Video") return;
+
+        const videoDurationSec = currentItem.video?.timeToShow || 30;
+        const closeAfterMs = videoDurationSec * 1000 + VIDEO_BUFFER_MS;
+
+        console.log(
+            `🎬 Video "${currentItem.title}" → closing in ${closeAfterMs / 1000}s (video.timeToShow: ${videoDurationSec}s)`
+        );
+
+        const playStartTime = Date.now();
+
+        const closeTimer = setTimeout(() => {
+            console.log("⏰ Video duration reached → closing");
+            closeAd();
+        }, closeAfterMs);
+
+        const handleMessage = (event) => {
+            if (!event.origin || !event.origin.includes("drive.google.com")) return;
+
+            let data = event.data;
+            if (typeof data === "string") {
+                try {
+                    data = JSON.parse(data);
+                } catch (e) {
+                    return;
+                }
+            }
+            if (!data || typeof data !== "object") return;
+
+            const eventName = data.event || data.type;
+            console.log("📩 Drive message:", eventName);
+
+            if (eventName === "ended" || eventName === "finish") {
+                const elapsed = Date.now() - playStartTime;
+
+                if (elapsed < MIN_PLAY_TIME_MS) {
+                    console.log(`⚠️ Ignored "ended" (only ${elapsed / 1000}s elapsed)`);
+                    return;
+                }
+
+                console.log(`🏁 Video ended after ${elapsed / 1000}s → closing`);
+                closeAd();
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+
+        const playTimer = setTimeout(() => {
+            try {
+                if (iframeRef.current?.contentWindow) {
+                    iframeRef.current.contentWindow.postMessage(
+                        JSON.stringify({ event: "command", func: "playVideo" }),
+                        "*"
+                    );
+                    console.log("▶️ Sent playVideo command");
+                }
+            } catch (e) {
+                console.log("⚠️ Could not send playVideo command");
+            }
+        }, 1500);
+
+        return () => {
+            window.removeEventListener("message", handleMessage);
+            clearTimeout(playTimer);
+            clearTimeout(closeTimer);
+        };
+    }, [isOpen, currentIndex, currentItem, closeAd]);
+
+    // ==========================================
+    // MANUAL NEXT / PREVIOUS
+    // ==========================================
+    const nextAd = () => goNext();
+    const previousAd = () => {
+        setCurrentIndex(
+            (prev) => (prev - 1 + mediaItems.length) % mediaItems.length
+        );
+    };
+
+    if (!currentItem || !isOpen) {
+        return null;
+    }
+
+    const progressDuration =
+        currentItem.type === "Poster"
+            ? currentItem.poster?.timeToShow || 10
+            : currentItem.video?.timeToShow || 30;
+
+    return (
+        <>
+            <style>{`
+        @keyframes adSlideIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes adFade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes adProgress {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+        .ads-popup { animation: adSlideIn 0.5s ease-out; }
+        .ads-image { animation: adFade 0.4s ease-in; }
+      `}</style>
+
+            <div
+                className="fixed inset-0 z-[9998] bg-black/70 backdrop-blur-sm"
+                onClick={closeAd}
+            />
+
+            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
+                <div className="pointer-events-auto w-full max-w-4xl ads-popup">
+                    <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_20px_70px_rgba(0,0,0,0.6)] border border-slate-200">
+                        <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/70 to-transparent">
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-white bg-white/20 px-2.5 py-1 rounded">
+                                    Advertisement
+                                </span>
+
+                                {currentItem.type === "Video" && (
+                                    <span className="text-[11px] text-white/90 font-medium">
+                                        ▶ Video
+                                    </span>
+                                )}
+                            </div>
+
+                            <button
+                                onClick={closeAd}
+                                className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition cursor-pointer text-sm"
+                                aria-label="Close advertisement"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        <div className="relative w-full aspect-video bg-black">
+                            {currentItem.type === "Video" ? (
+                                <iframe
+                                    ref={iframeRef}
+                                    key={currentItem._id}
+                                    id={`gdrive-player-${currentItem._id}`}
+                                    className="w-full h-full"
+                                    src={`${convertGoogleDriveUrl(currentItem.mediaUrl)}?autoplay=1`}
+                                    title={currentItem.title}
+                                    frameBorder="0"
+                                    allow="autoplay; encrypted-media; fullscreen"
+                                    allowFullScreen
+                                />
+                            ) : (
+                                <img
+                                    key={currentItem._id}
+                                    src={convertGoogleDriveImage(currentItem.mediaUrl)}
+                                    alt={currentItem.title}
+                                    className="ads-image w-full h-full object-cover"
+                                    onError={(e) => {
+                                        console.log("❌ Image failed to load:", e.target.src);
+                                        if (currentItem.thumb && e.target.src !== currentItem.thumb) {
+                                            e.target.src = currentItem.thumb;
+                                        }
+                                    }}
+                                    onLoad={() => {
+                                        console.log("✅ Image loaded:", currentItem.title);
+                                    }}
+                                />
+                            )}
+
+                            {mediaItems.length > 1 && (
+                                <button
+                                    onClick={previousAd}
+                                    className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition cursor-pointer text-lg z-30"
+                                >
+                                    ❮
+                                </button>
+                            )}
+
+                            {mediaItems.length > 1 && (
+                                <button
+                                    onClick={nextAd}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition cursor-pointer text-lg z-30"
+                                >
+                                    ❯
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="px-5 py-4 bg-white">
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="min-w-0">
+                                    <h3 className="text-base font-bold text-slate-900 truncate">
+                                        {currentItem.title}
+                                    </h3>
+                                    <p className="mt-1 text-sm text-slate-500 line-clamp-2">
+                                        {currentItem.description}
+                                    </p>
+                                </div>
+
+                                <div className="flex-shrink-0 text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
+                                    {currentIndex + 1}/{mediaItems.length}
+                                </div>
+                            </div>
+
+                            <div className="mt-3 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                {currentItem.type === "Poster" && (
+                                    <div
+                                        key={currentItem._id}
+                                        className="h-full bg-rose-500 rounded-full"
+                                        style={{
+                                            animation: `adProgress ${progressDuration}s linear`,
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </>
+    );
+}
