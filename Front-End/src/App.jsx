@@ -32,17 +32,17 @@ import ResetPassword from "./components/Login/ResetPassword";
 // ==========================================
 // GLOBAL CONTENT
 // ==========================================
-function GlobalContent() {
-    return (
-        <>
-            {/* Global Poster / Video */}
-            <VideoPosterDisplay />
-
-            {/* Current Page */}
-            <Outlet />
-        </>
-    );
-}
+// function GlobalContent() {
+//     return (
+//         <>
+//             {/* Global Poster / Video */}
+//             <VideoPosterDisplay />
+//
+//             {/* Current Page */}
+//             <Outlet />
+//         </>
+//     );
+// }
 
 
 function App() {
@@ -52,151 +52,150 @@ function App() {
         // ==========================================
         // ROOT
         // ==========================================
+        // {
+        //     element: <GlobalContent />,
+        //     children: [
         {
-            element: <GlobalContent />,
+            // ==========================================
+            // PUBLIC ROUTES
+            // ==========================================
+            element: <PublicRoute />,
             children: [
-
-                // ==========================================
-                // PUBLIC ROUTES
-                // ==========================================
                 {
-                    element: <PublicRoute />,
-                    children: [
-                        {
-                            path: "/login",
-                            element: <Login />,
-                        },
-                        {
-                            path: "/reset-password",
-                            element: <ResetPassword />,
-                        },
-                        {
-                            path: "/reset-password/:token",
-                            element: <ResetPassword />,
-                        },
-
-                        // Public pages
-                        {
-                            path: "/public/citizencharacter",
-                            element: <CitizensCharter />,
-                        },
-                        {
-                            path: "/public/corners",
-                            element: <Corner />,
-                        },
-                    ],
+                    path: "/login",
+                    element: <Login />,
+                },
+                {
+                    path: "/reset-password",
+                    element: <ResetPassword />,
+                },
+                {
+                    path: "/reset-password/:token",
+                    element: <ResetPassword />,
                 },
 
-
-                // ==========================================
-                // PRIVATE ROUTES
-                // ==========================================
+                // Public pages
                 {
-                    path: "/dashboard",
-                    element: <PrivateRoute />,
-                    children: [
-                        {
-                            element: <Layout />,
-                            children: [
-
-                                {
-                                    index: true,
-                                    element: <DashboardPage />,
-                                },
-
-                                {
-                                    path: "citizencharacter",
-                                    element: <CitizensCharter />,
-                                },
-
-                                {
-                                    path: "corners",
-                                    element: <Corner />,
-                                },
-
-                                {
-                                    path: "gadcorner",
-                                    element: <GAD />,
-                                },
-
-                                {
-                                    path: "qmscorner",
-                                    element: <QmsCorner />,
-                                },
-
-                                {
-                                    path: "new-customer",
-                                    element: (
-                                        <h1 className="title">
-                                            New Customer
-                                        </h1>
-                                    ),
-                                },
-
-                                {
-                                    path: "verified-customers",
-                                    element: (
-                                        <h1 className="title">
-                                            Verified Customers
-                                        </h1>
-                                    ),
-                                },
-
-                                {
-                                    path: "products",
-                                    element: (
-                                        <h1 className="title">
-                                            Products
-                                        </h1>
-                                    ),
-                                },
-
-                                {
-                                    path: "new-product",
-                                    element: (
-                                        <h1 className="title">
-                                            New Product
-                                        </h1>
-                                    ),
-                                },
-
-                                {
-                                    path: "inventory",
-                                    element: (
-                                        <h1 className="title">
-                                            Inventory
-                                        </h1>
-                                    ),
-                                },
-
-                                {
-                                    path: "settings",
-                                    element: (
-                                        <h1 className="title">
-                                            Settings
-                                        </h1>
-                                    ),
-                                },
-                            ],
-                        },
-                    ],
+                    path: "/public/citizencharacter",
+                    element: <CitizensCharter />,
                 },
-
-
-                // ==========================================
-                // FALLBACK
-                // ==========================================
                 {
-                    path: "*",
-                    element: (
-                        <Navigate
-                            to="/dashboard"
-                            replace
-                        />
-                    ),
+                    path: "/public/corners",
+                    element: <Corner />,
                 },
             ],
         },
+
+
+        // ==========================================
+        // PRIVATE ROUTES
+        // ==========================================
+        {
+            path: "/dashboard",
+            element: <PrivateRoute />,
+            children: [
+                {
+                    element: <Layout />,
+                    children: [
+
+                        {
+                            index: true,
+                            element: <DashboardPage />,
+                        },
+
+                        {
+                            path: "citizencharacter",
+                            element: <CitizensCharter />,
+                        },
+
+                        {
+                            path: "corners",
+                            element: <Corner />,
+                        },
+
+                        {
+                            path: "gadcorner",
+                            element: <GAD />,
+                        },
+
+                        {
+                            path: "qmscorner",
+                            element: <QmsCorner />,
+                        },
+
+                        {
+                            path: "new-customer",
+                            element: (
+                                <h1 className="title">
+                                    New Customer
+                                </h1>
+                            ),
+                        },
+
+                        {
+                            path: "verified-customers",
+                            element: (
+                                <h1 className="title">
+                                    Verified Customers
+                                </h1>
+                            ),
+                        },
+
+                        {
+                            path: "products",
+                            element: (
+                                <h1 className="title">
+                                    Products
+                                </h1>
+                            ),
+                        },
+
+                        {
+                            path: "new-product",
+                            element: (
+                                <h1 className="title">
+                                    New Product
+                                </h1>
+                            ),
+                        },
+
+                        {
+                            path: "inventory",
+                            element: (
+                                <h1 className="title">
+                                    Inventory
+                                </h1>
+                            ),
+                        },
+
+                        {
+                            path: "settings",
+                            element: (
+                                <h1 className="title">
+                                    Settings
+                                </h1>
+                            ),
+                        },
+                    ],
+                },
+            ],
+        },
+
+
+        // ==========================================
+        // FALLBACK
+        // ==========================================
+        {
+            path: "*",
+            element: (
+                <Navigate
+                    to="/dashboard"
+                    replace
+                />
+            ),
+        },
+        //     ],
+        // },
     ]);
 
 
